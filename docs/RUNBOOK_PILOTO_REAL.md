@@ -109,6 +109,15 @@ Entregar solo `reports/diagnostico_aprobado.md` o una version revisada manualmen
 
 Para una entrega mas ejecutiva, abrir `reports/diagnostico_aprobado.html` y exportar a PDF desde el navegador. Ver `docs/GUIA_EXPORTAR_INFORME_PDF.md`.
 
+Tambien se puede generar PDF automaticamente:
+
+```powershell
+$env:PYTHONPATH="src"
+python -m dataorchestra.cli export-pdf --client-dir clients/cliente_001
+```
+
+El comando se bloquea si no existe informe aprobado.
+
 ## 7. Cierre
 
 Registrar feedback del cliente, tiempos, errores, objeciones, utilidad percibida y decision de continuidad.

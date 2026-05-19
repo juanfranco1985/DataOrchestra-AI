@@ -130,10 +130,11 @@ Historial por corrida:
 Ultima verificacion realizada:
 
 ```text
-python -m pytest -q            -> 24 passed
+python -m pytest -q            -> 27 passed
 python -m compileall src tests -> OK
-CLI disponible                -> init-client, status, preflight, analyze, full-run, approve
+CLI disponible                -> init-client, status, preflight, analyze, full-run, approve, export-pdf
 Web Next.js                   -> npm run build OK, 7 paginas estaticas
+Export PDF demo               -> OK con Microsoft Edge headless
 ```
 
 ## Limites actuales
@@ -143,7 +144,7 @@ Web Next.js                   -> npm run build OK, 7 paginas estaticas
 - No hay contrato/aceptacion comercial versionada dentro de esta unidad.
 - No hay panel interno; la operacion sigue siendo por CLI.
 - El motor analitico es deterministico y basico; no reemplaza analisis experto ni garantiza resultados.
-- La exportacion PDF automatica no esta integrada; existe HTML aprobado imprimible/exportable a PDF desde navegador.
+- La exportacion PDF automatica esta integrada mediante navegador Chromium/Edge/Chrome local.
 - No hay mecanismo de entrega o marcado `delivered`; la entrega sigue siendo accion manual externa.
 - No hay persistencia historica multi-periodo ni comparacion mensual en v2.0.
 

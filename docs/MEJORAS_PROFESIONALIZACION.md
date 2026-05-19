@@ -114,7 +114,7 @@ Objetivo: poder vender pilotos con expectativa clara.
 - [x] Agregar pagina web de servicio.
 - [x] Agregar pagina web de privacidad.
 - [x] Agregar pagina web de demo.
-- [ ] Automatizar PDF.
+- [x] Automatizar PDF.
 - [ ] Crear panel interno privado.
 - [ ] Publicar web online.
 - [ ] Integrar formulario real.

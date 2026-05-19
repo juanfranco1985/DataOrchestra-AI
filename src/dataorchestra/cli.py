@@ -11,6 +11,7 @@ from dataorchestra.approval import approve_for_delivery
 from dataorchestra.audit import append_audit_event
 from dataorchestra.clients import create_client_workspace
 from dataorchestra.integrity import fingerprint_files
+from dataorchestra.pdf import export_report_pdf
 from dataorchestra.privacy import scan_csv_files
 from dataorchestra.runs import archive_file, new_run_id, run_stage_dir
 from dataorchestra.states import DiagnosticStatus
@@ -138,6 +139,29 @@ def run_full_run(client_dir: str | Path) -> dict:
     }
 
 
+def run_export_pdf(
+    client_dir: str | Path,
+    source: str = "approved",
+    output: str | Path | None = None,
+    browser_path: str | Path | None = None,
+) -> dict:
+    client_path = Path(client_dir)
+    result = export_report_pdf(client_path, source=source, output=output, browser_path=browser_path)
+    append_audit_event(
+        client_path / "logs" / "audit.jsonl",
+        "export_pdf",
+        str(result.get("client_id") or _read_client_id(client_path)),
+        str(result.get("status")),
+        {
+            "source": source,
+            "pdf_report": result.get("pdf_report"),
+            "can_deliver": bool(result.get("can_deliver")),
+            "run_id": result.get("run_id"),
+        },
+    )
+    return result
+
+
 def _read_client_id(client_path: Path) -> str:
     config_path = client_path / "client.yaml"
     if not config_path.exists():
@@ -168,6 +192,12 @@ def main() -> int:
 
     full_run = sub.add_parser("full-run", help="Run preflight and analysis without approval")
     full_run.add_argument("--client-dir", required=True)
+
+    export_pdf = sub.add_parser("export-pdf", help="Export an HTML report to PDF using Edge or Chrome")
+    export_pdf.add_argument("--client-dir", required=True)
+    export_pdf.add_argument("--source", choices=["approved", "draft"], default="approved")
+    export_pdf.add_argument("--output")
+    export_pdf.add_argument("--browser-path")
 
     approve = sub.add_parser("approve", help="Approve a reviewed draft for controlled delivery")
     approve.add_argument("--client-dir", required=True)
@@ -202,6 +232,10 @@ def main() -> int:
         result = run_full_run(args.client_dir)
         print(json.dumps(result, indent=2, ensure_ascii=False))
         return 0 if result["status"] == DiagnosticStatus.ANALYSIS_DONE.value else 2
+    if args.command == "export-pdf":
+        result = run_export_pdf(args.client_dir, source=args.source, output=args.output, browser_path=args.browser_path)
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        return 0 if result["status"] == "pdf_exported" else 2
     if args.command == "approve":
         result = run_approval(args.client_dir, args.reviewer, args.notes, args.confirm_human_review)
         print(json.dumps(result, indent=2, ensure_ascii=False))

@@ -38,6 +38,7 @@ dataorchestra preflight --client-dir clients/cliente_001
 dataorchestra analyze --client-dir clients/cliente_001
 dataorchestra full-run --client-dir clients/cliente_001
 dataorchestra approve --client-dir clients/cliente_001 --reviewer "Nombre responsable" --notes "Revision humana completada" --confirm-human-review
+dataorchestra export-pdf --client-dir clients/cliente_001
 ```
 
 Para ejecutar sin instalar el paquete:
@@ -52,6 +53,7 @@ python -m dataorchestra.cli preflight --client-dir clients/cliente_001
 python -m dataorchestra.cli analyze --client-dir clients/cliente_001
 python -m dataorchestra.cli full-run --client-dir clients/cliente_001
 python -m dataorchestra.cli approve --client-dir clients/cliente_001 --reviewer "Nombre responsable" --notes "Revision humana completada" --confirm-human-review
+python -m dataorchestra.cli export-pdf --client-dir clients/cliente_001
 ```
 
 En PowerShell:
@@ -85,6 +87,8 @@ La aprobacion humana se registra con `approve`. Solo crea artefactos aprobados s
 - `diagnostics/review/approval_record.json`
 
 El HTML aprobado esta preparado para abrir en navegador e imprimir o guardar como PDF. Ver `docs/GUIA_EXPORTAR_INFORME_PDF.md`.
+
+Tambien se puede generar PDF automaticamente con `export-pdf`, usando Microsoft Edge, Google Chrome o un navegador Chromium compatible instalado localmente.
 
 El estado aprobado es `approved_for_delivery`. La entrega al cliente sigue siendo una accion operativa separada.
 

@@ -33,6 +33,7 @@ Objetivo: mejorar la presentacion al cliente sin prometer automatizacion total.
 
 - Informe ejecutivo HTML aprobado. Estado: implementado.
 - Guia para exportar PDF desde navegador. Estado: implementado.
+- Exportacion PDF automatica con navegador Chromium/Edge/Chrome. Estado: implementado.
 - Aceptacion de piloto controlado. Estado: implementado.
 - Checklist de recepcion de datos. Estado: implementado.
 - Paquete comercial del piloto. Estado: implementado.
