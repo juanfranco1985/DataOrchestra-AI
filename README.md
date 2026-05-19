@@ -23,6 +23,7 @@ v2_0_primer_piloto_real_controlado/
   templates/                Plantillas CSV para datos anonimizados
   checklists/               Controles operativos obligatorios
   docs/                     Runbook, privacidad, admision y criterios
+  dataorchestra-web/        Landing institucional Next.js
 ```
 
 ## Comandos sugeridos
@@ -80,6 +81,24 @@ El HTML aprobado esta preparado para abrir en navegador e imprimir o guardar com
 El estado aprobado es `approved_for_delivery`. La entrega al cliente sigue siendo una accion operativa separada.
 
 Cada preflight, analisis y aprobacion genera un `run_id` y conserva copias historicas en `clients/<cliente>/runs/<run_id>/`. Los archivos actuales siguen quedando en `diagnostics/` y `reports/`.
+
+## Web institucional
+
+La landing institucional esta integrada en `dataorchestra-web/`.
+
+```powershell
+cd dataorchestra-web
+cmd /c npm.cmd install
+cmd /c npm.cmd run dev
+```
+
+Build de produccion:
+
+```powershell
+cmd /c npm.cmd run build
+```
+
+La web comunica el estado real del proyecto: servicio supervisado para diagnostico comercial de PyMEs, no SaaS ni plataforma autoservicio.
 
 ## Estado actual documentado
 

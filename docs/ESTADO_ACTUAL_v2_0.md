@@ -35,6 +35,7 @@ v2_0_primer_piloto_real_controlado/
   templates/                CSV esperados para ventas, productos y stock
   checklists/               Controles operativos obligatorios
   docs/                     Runbook, privacidad, readiness y estado
+  dataorchestra-web/        Landing institucional profesional
 ```
 
 ## Flujo operativo implementado
@@ -91,6 +92,7 @@ dataorchestra approve --client-dir clients/cliente_001 --reviewer "Nombre respon
 - Workflow CI preparado para GitHub Actions.
 - Paquete comercial y aceptacion de piloto documentados.
 - Caso demo ficticio reproducible.
+- Web institucional integrada en el repositorio.
 - Tests automatizados de privacidad, validacion, integridad, analisis, reporte y aprobacion.
 
 ## Artefactos generados
@@ -131,6 +133,7 @@ Ultima verificacion realizada:
 python -m pytest -q            -> 21 passed
 python -m compileall src tests -> OK
 CLI disponible                -> init-client, preflight, analyze, approve
+Web Next.js                   -> npm run build OK
 ```
 
 ## Limites actuales
