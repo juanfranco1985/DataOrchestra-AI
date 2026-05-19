@@ -18,6 +18,9 @@ dataorchestra = "dataorchestra.cli:main"
 dev = [
   "pytest>=8.0",
 ]
+panel = [
+  "streamlit>=1.33",
+]
 
 [tool.setuptools]
 package-dir = {"" = "src"}

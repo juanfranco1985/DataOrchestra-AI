@@ -93,6 +93,7 @@ dataorchestra approve --client-dir clients/cliente_001 --reviewer "Nombre respon
 - Paquete comercial y aceptacion de piloto documentados.
 - Caso demo ficticio reproducible.
 - Web institucional integrada en el repositorio.
+- Panel interno local para operar pilotos controlados.
 - Tests automatizados de privacidad, validacion, integridad, analisis, reporte y aprobacion.
 
 ## Artefactos generados
@@ -130,11 +131,12 @@ Historial por corrida:
 Ultima verificacion realizada:
 
 ```text
-python -m pytest -q            -> 27 passed
+python -m pytest -q            -> 30 passed
 python -m compileall src tests -> OK
 CLI disponible                -> init-client, status, preflight, analyze, full-run, approve, export-pdf
 Web Next.js                   -> npm run build OK, 7 paginas estaticas
 Export PDF demo               -> OK con Microsoft Edge headless
+Panel interno local           -> compileall OK, helpers testeados
 ```
 
 ## Limites actuales

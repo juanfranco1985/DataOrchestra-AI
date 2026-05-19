@@ -53,12 +53,12 @@ Objetivo: transformar el modulo demo en simulador conectado a datos procesados.
 
 Objetivo: operar sin tocar consola en tareas frecuentes.
 
-- Carga de archivos por cliente.
-- Preview de datos.
-- Resultado de preflight visible.
-- Estado del diagnostico.
-- Boton de generar borrador solo si el estado lo permite.
-- Bloqueo de entrega hasta aprobacion humana.
+- Carga de archivos por cliente. Estado: implementado en panel local.
+- Preview de datos. Estado: implementado para Markdown y audit log.
+- Resultado de preflight visible. Estado: implementado.
+- Estado del diagnostico. Estado: implementado con `status`.
+- Boton de generar borrador solo si el estado lo permite. Estado: implementado mediante acciones controladas.
+- Bloqueo de entrega hasta aprobacion humana. Estado: implementado.
 
 ## Fase 5 - Piloto y aprendizaje
 

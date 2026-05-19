@@ -17,6 +17,7 @@
   "included_areas": [
     "src/dataorchestra",
     "tests",
+    "tools",
     "clients/cliente_001",
     "templates",
     "demos",

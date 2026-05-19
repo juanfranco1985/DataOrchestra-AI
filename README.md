@@ -119,6 +119,18 @@ Paginas incluidas:
 - `/privacidad` criterios de datos anonimizados y controles.
 - `/demo` caso ficticio de referencia.
 
+## Panel interno local
+
+El panel interno local esta en `tools/internal_panel.py`.
+
+```powershell
+python -m pip install -e .[panel]
+$env:PYTHONPATH="src"
+python -m streamlit run tools/internal_panel.py
+```
+
+Ver `docs/PANEL_INTERNO_LOCAL.md`.
+
 ## Estado actual documentado
 
 La foto actual de estructura, alcance, validaciones y siguientes pasos esta en `docs/ESTADO_ACTUAL_v2_0.md`.
