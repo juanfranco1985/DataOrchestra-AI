@@ -1,0 +1,14 @@
+client:
+  id: cliente_001
+  display_name: "Primer cliente piloto"
+  business_type: "Pendiente"
+  status: intake_pending
+  currency: ARS
+privacy:
+  anonymized: false
+  authorization_received: false
+  sensitive_data_checked: false
+pilot:
+  scope: "Diagnostico inicial controlado"
+  report_status: pending_human_review
+  delivery_allowed: false

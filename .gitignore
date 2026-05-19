@@ -1,0 +1,27 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+dist/
+build/
+*.egg-info/
+
+# Datos y salidas de clientes reales. Mantener solo estructura vacia.
+clients/*/raw/*
+!clients/*/raw/.gitkeep
+clients/*/processed/*
+!clients/*/processed/.gitkeep
+clients/*/diagnostics/*
+!clients/*/diagnostics/.gitkeep
+clients/*/reports/*
+!clients/*/reports/.gitkeep
+clients/*/logs/*
+!clients/*/logs/.gitkeep
+clients/*/runs/*
+!clients/*/runs/.gitkeep
+
+# Salidas generadas por casos demo.
+demos/*/diagnostics/
+demos/*/reports/
+demos/*/logs/
+demos/*/runs/

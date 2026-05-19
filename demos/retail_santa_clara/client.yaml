@@ -1,0 +1,14 @@
+client:
+  id: demo_retail_santa_clara
+  display_name: "Demo Retail Santa Clara"
+  business_type: "Retail ficticio"
+  status: intake_pending
+  currency: ARS
+privacy:
+  anonymized: true
+  authorization_received: false
+  sensitive_data_checked: true
+pilot:
+  scope: "Caso demo ficticio para presentacion"
+  report_status: pending_human_review
+  delivery_allowed: false
