@@ -130,10 +130,10 @@ Historial por corrida:
 Ultima verificacion realizada:
 
 ```text
-python -m pytest -q            -> 21 passed
+python -m pytest -q            -> 24 passed
 python -m compileall src tests -> OK
-CLI disponible                -> init-client, preflight, analyze, approve
-Web Next.js                   -> npm run build OK
+CLI disponible                -> init-client, status, preflight, analyze, full-run, approve
+Web Next.js                   -> npm run build OK, 7 paginas estaticas
 ```
 
 ## Limites actuales

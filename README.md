@@ -33,8 +33,10 @@ Desde esta carpeta:
 ```bash
 python -m pip install -e .
 dataorchestra init-client --client-id cliente_002 --display-name "Cliente piloto 002"
+dataorchestra status --client-dir clients/cliente_001
 dataorchestra preflight --client-dir clients/cliente_001
 dataorchestra analyze --client-dir clients/cliente_001
+dataorchestra full-run --client-dir clients/cliente_001
 dataorchestra approve --client-dir clients/cliente_001 --reviewer "Nombre responsable" --notes "Revision humana completada" --confirm-human-review
 ```
 
@@ -45,8 +47,10 @@ python -m compileall src tests
 set PYTHONPATH=src
 python -m pytest -q
 python -m dataorchestra.cli init-client --client-id cliente_002 --display-name "Cliente piloto 002"
+python -m dataorchestra.cli status --client-dir clients/cliente_001
 python -m dataorchestra.cli preflight --client-dir clients/cliente_001
 python -m dataorchestra.cli analyze --client-dir clients/cliente_001
+python -m dataorchestra.cli full-run --client-dir clients/cliente_001
 python -m dataorchestra.cli approve --client-dir clients/cliente_001 --reviewer "Nombre responsable" --notes "Revision humana completada" --confirm-human-review
 ```
 
@@ -61,6 +65,10 @@ python -m dataorchestra.cli preflight --client-dir clients/cliente_001
 El preflight guarda `diagnostics/preflight/preflight_report.json` con el resultado de privacidad, validacion y fingerprints SHA-256 de los CSV recibidos en `raw/`. Tambien registra un evento en `logs/audit.jsonl`.
 
 Para operar mas de un cliente, crear una carpeta separada con `init-client`. No reutilizar `cliente_001` para clientes distintos. Ver `docs/OPERACION_MULTI_CLIENTE.md`.
+
+El comando `status` muestra el estado operativo del cliente, archivos faltantes, preflight, analisis, aprobacion y proxima accion recomendada.
+
+El comando `full-run` ejecuta `preflight` y, solo si esta listo, ejecuta `analyze`. No aprueba ni entrega informes; la aprobacion humana sigue siendo separada y obligatoria.
 
 El analisis solo corre si el preflight quedo en `ready_for_analysis` y si los fingerprints actuales de `raw/` coinciden con los aprobados. Genera metricas, alertas, recomendaciones y borradores en:
 
@@ -99,6 +107,13 @@ cmd /c npm.cmd run build
 ```
 
 La web comunica el estado real del proyecto: servicio supervisado para diagnostico comercial de PyMEs, no SaaS ni plataforma autoservicio.
+
+Paginas incluidas:
+
+- `/` landing institucional.
+- `/servicio` alcance del diagnostico.
+- `/privacidad` criterios de datos anonimizados y controles.
+- `/demo` caso ficticio de referencia.
 
 ## Estado actual documentado
 

@@ -14,6 +14,7 @@ from dataorchestra.integrity import fingerprint_files
 from dataorchestra.privacy import scan_csv_files
 from dataorchestra.runs import archive_file, new_run_id, run_stage_dir
 from dataorchestra.states import DiagnosticStatus
+from dataorchestra.status import inspect_client_status
 from dataorchestra.validation import validate_client_raw
 
 
@@ -110,6 +111,33 @@ def run_approval(client_dir: str | Path, reviewer: str, notes: str, confirm_huma
     return result
 
 
+def run_status(client_dir: str | Path) -> dict:
+    return inspect_client_status(client_dir)
+
+
+def run_full_run(client_dir: str | Path) -> dict:
+    preflight = run_preflight(client_dir)
+    if preflight["status"] != DiagnosticStatus.READY_FOR_ANALYSIS.value:
+        return {
+            "client_id": preflight["client_id"],
+            "status": preflight["status"],
+            "can_continue": False,
+            "preflight": preflight,
+            "analysis": None,
+            "next_action": inspect_client_status(client_dir)["next_action"],
+        }
+
+    analysis = run_analysis(client_dir)
+    return {
+        "client_id": analysis["client_id"],
+        "status": analysis["status"],
+        "can_continue": analysis["status"] == DiagnosticStatus.ANALYSIS_DONE.value,
+        "preflight": preflight,
+        "analysis": analysis,
+        "next_action": "Revisar diagnostico_borrador.* y aprobar con confirmacion humana si corresponde.",
+    }
+
+
 def _read_client_id(client_path: Path) -> str:
     config_path = client_path / "client.yaml"
     if not config_path.exists():
@@ -135,6 +163,12 @@ def main() -> int:
     analyze = sub.add_parser("analyze", help="Run deterministic pilot analytics after approved preflight")
     analyze.add_argument("--client-dir", required=True)
 
+    status = sub.add_parser("status", help="Inspect client operational state and next action")
+    status.add_argument("--client-dir", required=True)
+
+    full_run = sub.add_parser("full-run", help="Run preflight and analysis without approval")
+    full_run.add_argument("--client-dir", required=True)
+
     approve = sub.add_parser("approve", help="Approve a reviewed draft for controlled delivery")
     approve.add_argument("--client-dir", required=True)
     approve.add_argument("--reviewer", required=True)
@@ -158,6 +192,14 @@ def main() -> int:
         return 0 if report["status"] == DiagnosticStatus.READY_FOR_ANALYSIS.value else 2
     if args.command == "analyze":
         result = run_analysis(args.client_dir)
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        return 0 if result["status"] == DiagnosticStatus.ANALYSIS_DONE.value else 2
+    if args.command == "status":
+        result = run_status(args.client_dir)
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        return 0
+    if args.command == "full-run":
+        result = run_full_run(args.client_dir)
         print(json.dumps(result, indent=2, ensure_ascii=False))
         return 0 if result["status"] == DiagnosticStatus.ANALYSIS_DONE.value else 2
     if args.command == "approve":

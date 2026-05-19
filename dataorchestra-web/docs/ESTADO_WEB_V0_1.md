@@ -12,6 +12,9 @@ Crear una primera presencia comercial profesional para explicar DataOrchestra AI
 
 - Landing de una página.
 - Header con navegación por anclas.
+- Página de servicio.
+- Página de privacidad.
+- Página de caso demo ficticio.
 - Hero institucional con mensaje principal prudente.
 - Secciones de problema, solución, proceso, análisis, privacidad, diferenciación, piloto y contacto.
 - Formulario visual preparado para integración futura.
@@ -35,6 +38,13 @@ Crear una primera presencia comercial profesional para explicar DataOrchestra AI
 La web comunica el estado real de DataOrchestra AI: v2.0 - Primer Piloto Real Controlado.
 
 El proyecto se presenta como diagnóstico comercial controlado con datos anonimizados, trazabilidad, auditoría y revisión humana. No se presenta como plataforma final escalable.
+
+## Rutas actuales
+
+- `/`
+- `/servicio`
+- `/privacidad`
+- `/demo`
 
 ## Limitaciones actuales
 

@@ -8,9 +8,13 @@ Landing de una página para explicar el proyecto, su estado real, beneficios, pr
 
 Detalle del diagnóstico piloto, alcance, entregables, requisitos de datos y criterios de admisión.
 
+Estado: implementado como página inicial `/servicio`.
+
 ## v0.3 - Caso demo con dataset ficticio
 
 Página con ejemplo completo usando datos simulados, sin datos reales de clientes.
+
+Estado: implementado como página inicial `/demo`.
 
 ## v0.4 - Formulario funcional
 
@@ -23,6 +27,8 @@ Contenido sobre ventas, margen, stock, calidad de datos y decisiones comerciales
 ## v0.6 - Página de privacidad y términos
 
 Explicación formal del uso de datos anonimizados, alcance del servicio, limitaciones y responsabilidades.
+
+Estado parcial: página `/privacidad` implementada; faltan términos legales completos.
 
 ## v0.7 - Integración con CRM/email
 

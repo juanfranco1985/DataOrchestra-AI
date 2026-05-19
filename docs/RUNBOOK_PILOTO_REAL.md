@@ -30,6 +30,13 @@ Si se esta operando otro cliente, reemplazar `cliente_001` por el identificador 
 
 ## 3. Preflight
 
+Consultar estado antes de ejecutar:
+
+```powershell
+$env:PYTHONPATH="src"
+python -m dataorchestra.cli status --client-dir clients/cliente_001
+```
+
 Ejecutar:
 
 ```powershell
@@ -65,6 +72,15 @@ python -m dataorchestra.cli analyze --client-dir clients/cliente_001
 ```
 
 El analisis se bloquea si falta el preflight, si el preflight no esta en `ready_for_analysis` o si los CSV de `raw/` cambiaron despues del preflight aprobado.
+
+Para ejecutar preflight y analisis en una sola accion controlada:
+
+```powershell
+$env:PYTHONPATH="src"
+python -m dataorchestra.cli full-run --client-dir clients/cliente_001
+```
+
+`full-run` no aprueba informes ni reemplaza la revision humana.
 
 Todo resultado debe quedar en `diagnostics/` o `reports/`. Los borradores generados quedan en:
 

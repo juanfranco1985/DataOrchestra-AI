@@ -64,6 +64,9 @@ cmd /c npm.cmd run build
 dataorchestra-web/
   app/
     page.tsx
+    servicio/page.tsx
+    privacidad/page.tsx
+    demo/page.tsx
     layout.tsx
     globals.css
   components/
@@ -92,6 +95,8 @@ dataorchestra-web/
 ## Estado actual
 
 Versión v0.1: landing institucional de una página, sin backend y sin envío real de formulario.
+
+La version integrada agrega paginas informativas para servicio, privacidad y caso demo ficticio.
 
 ## Próximos pasos
 

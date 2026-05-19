@@ -1,7 +1,8 @@
 const footerLinks = [
-  { label: "Privacidad", href: "#privacidad" },
-  { label: "Piloto controlado", href: "#piloto" },
-  { label: "Contacto", href: "#contacto" }
+  { label: "Servicio", href: "/servicio" },
+  { label: "Privacidad", href: "/privacidad" },
+  { label: "Demo", href: "/demo" },
+  { label: "Contacto", href: "/#contacto" }
 ];
 
 export function Footer() {
