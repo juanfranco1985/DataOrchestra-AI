@@ -133,6 +133,7 @@ Paginas incluidas:
 - `/` landing institucional.
 - `/servicio` alcance del diagnostico.
 - `/privacidad` criterios de datos anonimizados y controles.
+- `/terminos-privacidad` base publica de terminos, privacidad y limites.
 - `/demo` caso ficticio de referencia.
 - `/faq` preguntas frecuentes y objeciones comerciales.
 
@@ -176,6 +177,7 @@ Para preparar la conversacion comercial y la admision, usar:
 
 - `docs/PAQUETE_COMERCIAL_PILOTO.md`
 - `docs/FAQ_COMERCIAL_PILOTO.md`
+- `docs/TERMINOS_Y_PRIVACIDAD_WEB.md`
 - `templates/aceptacion_piloto_controlado.md`
 - `templates/checklist_recepcion_datos_cliente.md`
 - `templates/checklist_seguridad_pre_cliente_real.md`

@@ -3,6 +3,7 @@ import { siteHref } from "@/components/routes";
 const footerLinks = [
   { label: "Servicio", href: "/servicio" },
   { label: "Privacidad", href: "/privacidad" },
+  { label: "Terminos", href: "/terminos-privacidad" },
   { label: "Demo", href: "/demo" },
   { label: "FAQ", href: "/faq" },
   { label: "Contacto", href: "/#contacto" }

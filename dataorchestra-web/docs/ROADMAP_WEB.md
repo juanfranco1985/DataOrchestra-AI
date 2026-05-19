@@ -6,6 +6,7 @@
 - v0.1.1 deploy publico preparado: export estatico de Next.js y workflow de GitHub Pages implementados.
 - v0.3.1 FAQ comercial: implementada como pagina `/faq`.
 - v0.4 formulario funcional inicial: implementado con email estructurado y copia para CRM.
+- v0.6 terminos y privacidad: base publica implementada como pagina `/terminos-privacidad`.
 - Pendiente operativo: activar Pages en GitHub con fuente `GitHub Actions`.
 - Pendiente operativo: configurar `DATAORCHESTRA_CONTACT_EMAIL`.
 
@@ -47,7 +48,7 @@ Contenido sobre ventas, margen, stock, calidad de datos y decisiones comerciales
 
 Explicacion formal del uso de datos anonimizados, alcance del servicio, limitaciones y responsabilidades.
 
-Estado parcial: pagina `/privacidad` implementada; faltan terminos legales completos.
+Estado: pagina `/privacidad` y base publica `/terminos-privacidad` implementadas. Falta revision legal profesional antes de usar como contrato definitivo.
 
 ## v0.7 - Integracion con CRM/email
 

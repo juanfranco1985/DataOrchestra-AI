@@ -108,6 +108,7 @@ dataorchestra-web/
     page.tsx
     servicio/page.tsx
     privacidad/page.tsx
+    terminos-privacidad/page.tsx
     demo/page.tsx
     faq/page.tsx
     layout.tsx
@@ -147,10 +148,12 @@ El formulario actual prepara solicitudes por email y copia para CRM, sin backend
 
 La pagina `/faq` agrega preguntas frecuentes y objeciones comerciales para explicar alcance, privacidad y limites del piloto.
 
-## Próximos pasos
+La pagina `/terminos-privacidad` agrega una base publica de terminos, privacidad, limitaciones y criterios de uso de datos.
+
+## Proximos pasos
 
 - Integrar backend, webhook o CRM para registrar solicitudes.
-- Agregar página de privacidad y términos.
-- Crear caso demo con dataset ficticio.
-- Preparar una sección de servicios.
-- Evaluar un panel privado para pilotos cuando el flujo comercial lo justifique.
+- Activar GitHub Pages y probar la web publicada.
+- Configurar `DATAORCHESTRA_CONTACT_EMAIL`.
+- Revisar terminos y privacidad con soporte legal.
+- Medir visitas y conversiones.

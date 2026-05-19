@@ -14,6 +14,7 @@ Crear una primera presencia comercial profesional para explicar DataOrchestra AI
 - Header con navegacion por anclas.
 - Pagina de servicio.
 - Pagina de privacidad.
+- Pagina de terminos y privacidad.
 - Pagina de caso demo ficticio.
 - Pagina de preguntas frecuentes y objeciones comerciales.
 - Hero institucional con mensaje principal prudente.
@@ -31,7 +32,7 @@ Crear una primera presencia comercial profesional para explicar DataOrchestra AI
 - Registro automatico de leads.
 - CRM integrado.
 - Blog.
-- Pagina legal completa.
+- Contrato legal definitivo.
 - Panel privado web.
 - Area de clientes.
 - Funcionalidad SaaS o autoservicio.
@@ -47,6 +48,7 @@ El proyecto se presenta como diagnostico comercial controlado con datos anonimiz
 - `/`
 - `/servicio`
 - `/privacidad`
+- `/terminos-privacidad`
 - `/demo`
 - `/faq`
 
@@ -54,7 +56,7 @@ El proyecto se presenta como diagnostico comercial controlado con datos anonimiz
 
 - El formulario depende del cliente de correo del usuario.
 - Sin analytics.
-- Sin paginas legales especificas.
+- Sin revision legal profesional final.
 - Sin captacion automatizada.
 - Sin sistema de gestion de leads.
 - GitHub Pages pendiente de activacion manual en el repositorio.
@@ -65,5 +67,5 @@ El proyecto se presenta como diagnostico comercial controlado con datos anonimiz
 2. Configurar `DATAORCHESTRA_CONTACT_EMAIL` en variables del repositorio.
 3. Validar el copy con potenciales clientes piloto.
 4. Integrar backend, webhook o CRM para registrar solicitudes.
-5. Completar paginas legales especificas.
+5. Revisar terminos y privacidad con soporte legal.
 6. Medir visitas y conversiones.

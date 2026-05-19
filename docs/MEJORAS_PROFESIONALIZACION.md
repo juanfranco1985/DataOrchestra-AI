@@ -122,5 +122,6 @@ Objetivo: poder vender pilotos con expectativa clara.
 - [x] Preparar deploy web en GitHub Pages.
 - [x] Crear formulario de contacto controlado por email.
 - [x] Agregar FAQ comercial publica e interna.
+- [x] Agregar base publica de terminos y privacidad.
 - [ ] Publicar web online.
 - [ ] Integrar backend, webhook o CRM.
