@@ -109,6 +109,7 @@ dataorchestra-web/
     servicio/page.tsx
     privacidad/page.tsx
     demo/page.tsx
+    faq/page.tsx
     layout.tsx
     globals.css
   components/
@@ -143,6 +144,8 @@ La version integrada agrega paginas informativas para servicio, privacidad y cas
 Tambien queda preparada para deploy estatico en GitHub Pages.
 
 El formulario actual prepara solicitudes por email y copia para CRM, sin backend propio.
+
+La pagina `/faq` agrega preguntas frecuentes y objeciones comerciales para explicar alcance, privacidad y limites del piloto.
 
 ## Próximos pasos
 

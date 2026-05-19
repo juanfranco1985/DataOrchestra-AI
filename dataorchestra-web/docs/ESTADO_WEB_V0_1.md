@@ -15,6 +15,7 @@ Crear una primera presencia comercial profesional para explicar DataOrchestra AI
 - Pagina de servicio.
 - Pagina de privacidad.
 - Pagina de caso demo ficticio.
+- Pagina de preguntas frecuentes y objeciones comerciales.
 - Hero institucional con mensaje principal prudente.
 - Secciones de problema, solucion, proceso, analisis, privacidad, diferenciacion, piloto y contacto.
 - Formulario de contacto controlado por email, sin backend ni carga de archivos.
@@ -47,6 +48,7 @@ El proyecto se presenta como diagnostico comercial controlado con datos anonimiz
 - `/servicio`
 - `/privacidad`
 - `/demo`
+- `/faq`
 
 ## Limitaciones actuales
 

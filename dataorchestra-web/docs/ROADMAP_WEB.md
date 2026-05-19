@@ -4,6 +4,7 @@
 
 - v0.1 landing institucional: implementada.
 - v0.1.1 deploy publico preparado: export estatico de Next.js y workflow de GitHub Pages implementados.
+- v0.3.1 FAQ comercial: implementada como pagina `/faq`.
 - v0.4 formulario funcional inicial: implementado con email estructurado y copia para CRM.
 - Pendiente operativo: activar Pages en GitHub con fuente `GitHub Actions`.
 - Pendiente operativo: configurar `DATAORCHESTRA_CONTACT_EMAIL`.
@@ -31,6 +32,12 @@ Estado: implementado como pagina inicial `/demo`.
 Integracion inicial con email mediante `mailto:`, validaciones de campos, confirmacion de alcance y copia de solicitud para CRM.
 
 Estado: implementado sin backend.
+
+## v0.4.1 - FAQ comercial y objeciones
+
+Pagina publica con preguntas frecuentes sobre alcance, privacidad, tiempos, entregables y limites del piloto.
+
+Estado: implementado como pagina `/faq`.
 
 ## v0.5 - Blog educativo
 

@@ -95,6 +95,7 @@ dataorchestra approve --client-dir clients/cliente_001 --reviewer "Nombre respon
 - Web institucional integrada en el repositorio.
 - Deploy estatico de la web preparado para GitHub Pages.
 - Formulario de contacto controlado por email, sin backend ni carga de archivos.
+- FAQ publica e interna para preguntas comerciales, privacidad y limites del piloto.
 - Repositorio remoto GitHub integrado: `juanfranco1985/DataOrchestra-AI`.
 - Panel interno local para operar pilotos controlados.
 - Runtime externo para datos reales.
@@ -141,6 +142,7 @@ python -m compileall src tests -> OK
 CLI disponible                -> init-client, prepare-runtime, status, preflight, analyze, full-run, approve, export-pdf, close-pilot
 Web Next.js                   -> npm run build OK, export estatico preparado
 Web GitHub Pages              -> build OK con basePath /DataOrchestra-AI
+Web FAQ comercial             -> ruta /faq incluida en export estatico
 Export PDF demo               -> OK con Microsoft Edge headless
 Panel interno local           -> compileall OK, helpers testeados
 ```

@@ -6,6 +6,7 @@ const navItems = [
   { label: "Cómo funciona", href: "/#proceso" },
   { label: "Privacidad", href: "/privacidad" },
   { label: "Demo", href: "/demo" },
+  { label: "FAQ", href: "/faq" },
   { label: "Contacto", href: "/#contacto" }
 ];
 
@@ -20,7 +21,7 @@ export function Header() {
           <span className="text-base font-semibold text-white">DataOrchestra AI</span>
         </a>
 
-        <nav className="hidden items-center gap-6 text-sm text-slate-300 lg:flex" aria-label="Navegación principal">
+        <nav className="hidden items-center gap-4 text-sm text-slate-300 lg:flex" aria-label="Navegación principal">
           {navItems.map((item) => (
             <a key={item.href} href={siteHref(item.href)} className="focus-ring rounded py-2 transition hover:text-white">
               {item.label}

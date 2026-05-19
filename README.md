@@ -134,6 +134,7 @@ Paginas incluidas:
 - `/servicio` alcance del diagnostico.
 - `/privacidad` criterios de datos anonimizados y controles.
 - `/demo` caso ficticio de referencia.
+- `/faq` preguntas frecuentes y objeciones comerciales.
 
 ## Panel interno local
 
@@ -174,6 +175,7 @@ Usar las plantillas de `templates/` para pedir datos anonimizados al primer clie
 Para preparar la conversacion comercial y la admision, usar:
 
 - `docs/PAQUETE_COMERCIAL_PILOTO.md`
+- `docs/FAQ_COMERCIAL_PILOTO.md`
 - `templates/aceptacion_piloto_controlado.md`
 - `templates/checklist_recepcion_datos_cliente.md`
 - `templates/checklist_seguridad_pre_cliente_real.md`
