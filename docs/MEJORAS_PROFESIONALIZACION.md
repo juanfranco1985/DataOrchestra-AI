@@ -120,5 +120,6 @@ Objetivo: poder vender pilotos con expectativa clara.
 - [x] Crear runtime seguro para datos reales.
 - [x] Agregar cierre auditable de piloto.
 - [x] Preparar deploy web en GitHub Pages.
+- [x] Crear formulario de contacto controlado por email.
 - [ ] Publicar web online.
-- [ ] Integrar formulario real.
+- [ ] Integrar backend, webhook o CRM.

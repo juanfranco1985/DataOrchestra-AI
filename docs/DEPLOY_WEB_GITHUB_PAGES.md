@@ -43,6 +43,22 @@ https://github.com/juanfranco1985/DataOrchestra-AI
 6. Ir a la pestaña `Actions`.
 7. Ejecutar manualmente `Deploy web to GitHub Pages` o esperar al proximo push en `main` que modifique `dataorchestra-web/`.
 
+## Configurar email de contacto
+
+Para que el formulario prepare correos con destinatario, crear esta variable del repositorio:
+
+```text
+DATAORCHESTRA_CONTACT_EMAIL
+```
+
+Ruta:
+
+```text
+Settings -> Secrets and variables -> Actions -> Variables -> New repository variable
+```
+
+El valor debe ser el email operativo donde se recibiran solicitudes de evaluacion. Ver `docs/FORMULARIO_CONTACTO_CONTROLADO.md`.
+
 ## Validacion local normal
 
 Desde `dataorchestra-web/`:
@@ -72,11 +88,11 @@ dataorchestra-web/out/
 ## Consideraciones
 
 - La web sigue siendo institucional y estatica.
-- El formulario de contacto no envia datos reales en esta version.
+- El formulario prepara un correo estructurado y no sube archivos.
 - No se publica ninguna carpeta de clientes, reportes, logs ni datos reales.
 - El sitio no convierte DataOrchestra AI en SaaS ni autoservicio.
 - El deploy publico solo mejora presencia comercial y confianza externa.
 
 ## Siguiente mejora relacionada
 
-Integrar un formulario real con email o CRM, manteniendo el aviso de no cargar datos sensibles en el formulario.
+Integrar backend, webhook o CRM para registrar solicitudes con trazabilidad comercial.

@@ -124,6 +124,7 @@ Deploy publico preparado:
 - Hosting objetivo: GitHub Pages.
 - URL esperada: `https://juanfranco1985.github.io/DataOrchestra-AI/`.
 - Guia de activacion: `docs/DEPLOY_WEB_GITHUB_PAGES.md`.
+- Formulario de contacto controlado: `docs/FORMULARIO_CONTACTO_CONTROLADO.md`.
 
 La web comunica el estado real del proyecto: servicio supervisado para diagnostico comercial de PyMEs, no SaaS ni plataforma autoservicio.
 

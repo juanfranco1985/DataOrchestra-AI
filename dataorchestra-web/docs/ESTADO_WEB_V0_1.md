@@ -1,45 +1,45 @@
 # Estado web v0.1
 
-## Nombre de la versión
+## Nombre de la version
 
 DataOrchestra AI Web v0.1 - Landing institucional.
 
 ## Objetivo
 
-Crear una primera presencia comercial profesional para explicar DataOrchestra AI como servicio supervisado de diagnóstico comercial para PyMEs.
+Crear una primera presencia comercial profesional para explicar DataOrchestra AI como servicio supervisado de diagnostico comercial para PyMEs.
 
-## Qué incluye
+## Que incluye
 
-- Landing de una página.
-- Header con navegación por anclas.
-- Página de servicio.
-- Página de privacidad.
-- Página de caso demo ficticio.
+- Landing de una pagina.
+- Header con navegacion por anclas.
+- Pagina de servicio.
+- Pagina de privacidad.
+- Pagina de caso demo ficticio.
 - Hero institucional con mensaje principal prudente.
-- Secciones de problema, solución, proceso, análisis, privacidad, diferenciación, piloto y contacto.
-- Formulario visual preparado para integración futura.
-- SEO básico en `app/layout.tsx`.
+- Secciones de problema, solucion, proceso, analisis, privacidad, diferenciacion, piloto y contacto.
+- Formulario de contacto controlado por email, sin backend ni carga de archivos.
+- SEO basico en `app/layout.tsx`.
 - Diseño responsive con Tailwind CSS.
-- Documentación comercial y de diseño.
+- Documentacion comercial y de diseño.
 - Export estatico de Next.js.
 - Workflow de GitHub Pages preparado.
 
-## Qué no incluye
+## Que no incluye
 
-- Backend.
-- Envío real de formularios.
-- CRM.
+- Backend propio.
+- Registro automatico de leads.
+- CRM integrado.
 - Blog.
-- Página legal completa.
-- Panel privado.
-- Área de clientes.
+- Pagina legal completa.
+- Panel privado web.
+- Area de clientes.
 - Funcionalidad SaaS o autoservicio.
 
 ## Estado del producto
 
 La web comunica el estado real de DataOrchestra AI: v2.0 - Primer Piloto Real Controlado.
 
-El proyecto se presenta como diagnóstico comercial controlado con datos anonimizados, trazabilidad, auditoría y revisión humana. No se presenta como plataforma final escalable.
+El proyecto se presenta como diagnostico comercial controlado con datos anonimizados, trazabilidad, auditoria y revision humana. No se presenta como plataforma final escalable.
 
 ## Rutas actuales
 
@@ -50,18 +50,18 @@ El proyecto se presenta como diagnóstico comercial controlado con datos anonimi
 
 ## Limitaciones actuales
 
-- Formulario sin integración.
+- El formulario depende del cliente de correo del usuario.
 - Sin analytics.
-- Sin páginas legales específicas.
-- Sin captación automatizada.
-- Sin sistema de gestión de leads.
+- Sin paginas legales especificas.
+- Sin captacion automatizada.
+- Sin sistema de gestion de leads.
 - GitHub Pages pendiente de activacion manual en el repositorio.
 
-## Próximos pasos recomendados
+## Proximos pasos recomendados
 
-1. Validar el copy con potenciales clientes piloto.
-2. Activar GitHub Pages con fuente `GitHub Actions`.
-3. Integrar un formulario real.
-4. Completar paginas legales especificas.
-5. Medir visitas y conversiones.
-6. Evaluar un panel privado solo despues de validar pilotos reales.
+1. Activar GitHub Pages con fuente `GitHub Actions`.
+2. Configurar `DATAORCHESTRA_CONTACT_EMAIL` en variables del repositorio.
+3. Validar el copy con potenciales clientes piloto.
+4. Integrar backend, webhook o CRM para registrar solicitudes.
+5. Completar paginas legales especificas.
+6. Medir visitas y conversiones.

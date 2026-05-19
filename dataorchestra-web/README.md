@@ -60,6 +60,18 @@ cmd /c npm.cmd run build
 
 El build genera una exportacion estatica en `out/`, preparada para hosting estatico.
 
+## Formulario de contacto
+
+El formulario de contacto valida campos en el navegador, exige aceptar el alcance de datos anonimizados y prepara un correo estructurado con `mailto:`. No sube archivos ni guarda datos en servidor.
+
+Para configurar el destinatario en build:
+
+```powershell
+$env:NEXT_PUBLIC_CONTACT_EMAIL="tu-email-operativo@dominio.com"
+```
+
+En GitHub Pages, usar la variable del repositorio `DATAORCHESTRA_CONTACT_EMAIL`. Ver `../docs/FORMULARIO_CONTACTO_CONTROLADO.md`.
+
 ## Deploy en GitHub Pages
 
 El repositorio principal incluye un workflow para publicar esta web en GitHub Pages:
@@ -124,15 +136,17 @@ dataorchestra-web/
 
 ## Estado actual
 
-Versión v0.1: landing institucional de una página, sin backend y sin envío real de formulario.
+Versión v0.1: landing institucional de una página, sin backend propio.
 
 La version integrada agrega paginas informativas para servicio, privacidad y caso demo ficticio.
 
 Tambien queda preparada para deploy estatico en GitHub Pages.
 
+El formulario actual prepara solicitudes por email y copia para CRM, sin backend propio.
+
 ## Próximos pasos
 
-- Integrar formulario real con email o CRM.
+- Integrar backend, webhook o CRM para registrar solicitudes.
 - Agregar página de privacidad y términos.
 - Crear caso demo con dataset ficticio.
 - Preparar una sección de servicios.
