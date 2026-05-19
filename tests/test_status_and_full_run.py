@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from dataorchestra.cli import run_approval, run_full_run, run_status
+from dataorchestra.cli import run_approval, run_close_pilot, run_full_run, run_status
 from test_analysis import write_analysis_client
 
 
@@ -48,3 +48,28 @@ def test_status_reports_approved_delivery_after_human_approval(tmp_path: Path):
     assert status["current_stage"] == "approved_for_delivery"
     assert status["approval"]["exists"] is True
     assert "Entregar" in status["next_action"]
+
+
+def test_status_reports_closed_pilot_as_final_operational_stage(tmp_path: Path):
+    client_dir = tmp_path / "cliente_status_closed"
+    write_analysis_client(client_dir)
+    assert run_full_run(client_dir)["status"] == "analysis_done"
+    assert run_approval(
+        client_dir,
+        reviewer="Responsable",
+        notes="Revision humana completada.",
+        confirm_human_review=True,
+    )["status"] == "approved_for_delivery"
+    assert run_close_pilot(
+        client_dir,
+        reviewer="Responsable",
+        notes="Cierre operativo registrado.",
+        outcome="completed",
+        confirm_close=True,
+    )["status"] == "pilot_closed"
+
+    status = run_status(client_dir)
+
+    assert status["current_stage"] == "pilot_closed"
+    assert status["closure"]["exists"] is True
+    assert "No procesar" in status["next_action"]

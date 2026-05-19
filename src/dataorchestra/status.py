@@ -18,9 +18,10 @@ def inspect_client_status(client_dir: str | Path) -> dict[str, Any]:
     preflight = _read_json(client_path / "diagnostics" / "preflight" / "preflight_report.json")
     analysis = _read_json(client_path / "reports" / "diagnostico_borrador.json")
     approval = _read_json(client_path / "diagnostics" / "review" / "approval_record.json")
+    closure = _read_json(client_path / "diagnostics" / "closure" / "closure_record.json")
     config = _read_yaml(client_path / "client.yaml")
     raw_files = _raw_files_status(raw_dir)
-    current_stage = _current_stage(raw_files, preflight, analysis, approval)
+    current_stage = _current_stage(raw_files, preflight, analysis, approval, closure, config)
 
     return {
         "client_id": _client_id(client_path, config),
@@ -31,11 +32,23 @@ def inspect_client_status(client_dir: str | Path) -> dict[str, Any]:
         "preflight": _preflight_status(preflight),
         "analysis": _analysis_status(analysis),
         "approval": _approval_status(approval),
+        "closure": _closure_status(closure),
         "last_audit_event": _last_audit_event(client_path / "logs" / "audit.jsonl"),
     }
 
 
-def _current_stage(raw_files: dict[str, Any], preflight: dict | None, analysis: dict | None, approval: dict | None) -> str:
+def _current_stage(
+    raw_files: dict[str, Any],
+    preflight: dict | None,
+    analysis: dict | None,
+    approval: dict | None,
+    closure: dict | None,
+    config: dict,
+) -> str:
+    if closure and closure.get("status") == DiagnosticStatus.PILOT_CLOSED.value:
+        return DiagnosticStatus.PILOT_CLOSED.value
+    if config.get("client", {}).get("status") == DiagnosticStatus.PILOT_CLOSED.value:
+        return DiagnosticStatus.PILOT_CLOSED.value
     if approval and approval.get("status") == DiagnosticStatus.APPROVED_FOR_DELIVERY.value:
         return DiagnosticStatus.APPROVED_FOR_DELIVERY.value
     if analysis and analysis.get("report_status") == DiagnosticStatus.PENDING_HUMAN_REVIEW.value:
@@ -57,6 +70,7 @@ def _next_action(stage: str) -> str:
         DiagnosticStatus.READY_FOR_ANALYSIS.value: "Ejecutar analyze para generar borradores internos.",
         DiagnosticStatus.PENDING_HUMAN_REVIEW.value: "Revisar el borrador y aprobar solo con confirmacion humana.",
         DiagnosticStatus.APPROVED_FOR_DELIVERY.value: "Entregar solo el informe aprobado o exportarlo a PDF.",
+        DiagnosticStatus.PILOT_CLOSED.value: "No procesar mas datos. Revisar retencion o borrado segun politica.",
         "preflight_required": "Ejecutar preflight antes de analizar.",
     }
     return actions.get(stage, "Revisar el estado operativo del cliente.")
@@ -106,6 +120,19 @@ def _approval_status(approval: dict | None) -> dict[str, Any]:
         "run_id": approval.get("run_id"),
         "reviewer": approval.get("reviewer"),
         "approved_at": approval.get("approved_at"),
+    }
+
+
+def _closure_status(closure: dict | None) -> dict[str, Any]:
+    if not closure:
+        return {"exists": False}
+    return {
+        "exists": True,
+        "status": closure.get("status"),
+        "outcome": closure.get("outcome"),
+        "reviewer": closure.get("reviewer"),
+        "closed_at": closure.get("closed_at"),
+        "data_retention_action_required": closure.get("data_retention_action_required"),
     }
 
 

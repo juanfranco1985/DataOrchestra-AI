@@ -33,12 +33,14 @@ Desde esta carpeta:
 ```bash
 python -m pip install -e .
 dataorchestra init-client --client-id cliente_002 --display-name "Cliente piloto 002"
+dataorchestra prepare-runtime --runtime-dir "C:\Documentos\DataOrchestra_Runtime"
 dataorchestra status --client-dir clients/cliente_001
 dataorchestra preflight --client-dir clients/cliente_001
 dataorchestra analyze --client-dir clients/cliente_001
 dataorchestra full-run --client-dir clients/cliente_001
 dataorchestra approve --client-dir clients/cliente_001 --reviewer "Nombre responsable" --notes "Revision humana completada" --confirm-human-review
 dataorchestra export-pdf --client-dir clients/cliente_001
+dataorchestra close-pilot --client-dir clients/cliente_001 --reviewer "Nombre responsable" --notes "Cierre registrado" --outcome completed --confirm-close
 ```
 
 Para ejecutar sin instalar el paquete:
@@ -48,12 +50,14 @@ python -m compileall src tests
 set PYTHONPATH=src
 python -m pytest -q
 python -m dataorchestra.cli init-client --client-id cliente_002 --display-name "Cliente piloto 002"
+python -m dataorchestra.cli prepare-runtime --runtime-dir "C:\Documentos\DataOrchestra_Runtime"
 python -m dataorchestra.cli status --client-dir clients/cliente_001
 python -m dataorchestra.cli preflight --client-dir clients/cliente_001
 python -m dataorchestra.cli analyze --client-dir clients/cliente_001
 python -m dataorchestra.cli full-run --client-dir clients/cliente_001
 python -m dataorchestra.cli approve --client-dir clients/cliente_001 --reviewer "Nombre responsable" --notes "Revision humana completada" --confirm-human-review
 python -m dataorchestra.cli export-pdf --client-dir clients/cliente_001
+python -m dataorchestra.cli close-pilot --client-dir clients/cliente_001 --reviewer "Nombre responsable" --notes "Cierre registrado" --outcome completed --confirm-close
 ```
 
 En PowerShell:
@@ -71,6 +75,10 @@ Para operar mas de un cliente, crear una carpeta separada con `init-client`. No 
 El comando `status` muestra el estado operativo del cliente, archivos faltantes, preflight, analisis, aprobacion y proxima accion recomendada.
 
 El comando `full-run` ejecuta `preflight` y, solo si esta listo, ejecuta `analyze`. No aprueba ni entrega informes; la aprobacion humana sigue siendo separada y obligatoria.
+
+Para datos reales, usar un runtime externo al repositorio. Ver `docs/RUNTIME_SEGURO_DATOS_REALES.md` y `docs/POLITICA_DATOS_REALES.md`.
+
+El comando `close-pilot` registra cierre operativo, resultado y obliga a revisar retencion o borrado. No borra datos automaticamente.
 
 El analisis solo corre si el preflight quedo en `ready_for_analysis` y si los fingerprints actuales de `raw/` coinciden con los aprobados. Genera metricas, alertas, recomendaciones y borradores en:
 
@@ -160,5 +168,6 @@ Para preparar la conversacion comercial y la admision, usar:
 - `docs/PAQUETE_COMERCIAL_PILOTO.md`
 - `templates/aceptacion_piloto_controlado.md`
 - `templates/checklist_recepcion_datos_cliente.md`
+- `templates/checklist_seguridad_pre_cliente_real.md`
 
 Para practicar el flujo sin datos reales, ejecutar el caso ficticio `demos/retail_santa_clara`. Ver `docs/CASO_DEMO_FICTICIO.md`.

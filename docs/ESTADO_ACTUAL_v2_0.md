@@ -94,6 +94,8 @@ dataorchestra approve --client-dir clients/cliente_001 --reviewer "Nombre respon
 - Caso demo ficticio reproducible.
 - Web institucional integrada en el repositorio.
 - Panel interno local para operar pilotos controlados.
+- Runtime externo para datos reales.
+- Cierre auditable de pilotos.
 - Tests automatizados de privacidad, validacion, integridad, analisis, reporte y aprobacion.
 
 ## Artefactos generados
@@ -131,9 +133,9 @@ Historial por corrida:
 Ultima verificacion realizada:
 
 ```text
-python -m pytest -q            -> 30 passed
+python -m pytest -q            -> 34 passed
 python -m compileall src tests -> OK
-CLI disponible                -> init-client, status, preflight, analyze, full-run, approve, export-pdf
+CLI disponible                -> init-client, prepare-runtime, status, preflight, analyze, full-run, approve, export-pdf, close-pilot
 Web Next.js                   -> npm run build OK, 7 paginas estaticas
 Export PDF demo               -> OK con Microsoft Edge headless
 Panel interno local           -> compileall OK, helpers testeados

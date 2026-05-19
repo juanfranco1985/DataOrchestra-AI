@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import os
 import sys
 
 import streamlit as st
@@ -10,7 +11,17 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from dataorchestra.cli import run_analysis, run_approval, run_export_pdf, run_full_run, run_init_client, run_preflight, run_status
+from dataorchestra.cli import (
+    run_analysis,
+    run_approval,
+    run_close_pilot,
+    run_export_pdf,
+    run_full_run,
+    run_init_client,
+    run_prepare_runtime,
+    run_preflight,
+    run_status,
+)
 from dataorchestra.panel_support import client_label, list_client_dirs, raw_file_table, read_text_preview
 
 
@@ -21,7 +32,7 @@ def main() -> None:
     st.title("DataOrchestra AI - Panel interno local")
     st.caption("Herramienta privada para operar pilotos controlados. No es portal de clientes ni SaaS.")
 
-    clients_root = ROOT / "clients"
+    clients_root = runtime_sidebar()
     selected_client = sidebar(clients_root)
 
     if selected_client is None:
@@ -42,6 +53,19 @@ def main() -> None:
         render_outputs(selected_client)
     with tabs[4]:
         render_audit(selected_client)
+
+
+def runtime_sidebar() -> Path:
+    st.sidebar.header("Runtime")
+    default_root = os.environ.get("DATAORCHESTRA_CLIENTS_ROOT") or str(ROOT / "clients")
+    clients_root = Path(st.sidebar.text_input("Raiz de clientes", value=default_root))
+    with st.sidebar.expander("Preparar runtime seguro", expanded=False):
+        runtime_dir = st.text_input("Runtime dir", value=str(Path.home() / "DataOrchestra_Runtime"))
+        if st.button("Crear estructura runtime", use_container_width=True):
+            result = run_prepare_runtime(runtime_dir)
+            st.json(result)
+            st.info(f"Raiz recomendada de clientes: {result['recommended_clients_root']}")
+    return clients_root
 
 
 def sidebar(clients_root: Path) -> Path | None:
@@ -138,6 +162,23 @@ def render_operations(client_dir: Path) -> None:
     st.subheader("PDF")
     if st.button("Exportar informe aprobado a PDF"):
         st.json(run_export_pdf(client_dir))
+
+    st.divider()
+    st.subheader("Cierre de piloto")
+    close_reviewer = st.text_input("Responsable de cierre")
+    close_notes = st.text_area("Notas de cierre")
+    outcome = st.selectbox("Resultado", ["completed", "needs_follow_up", "converted_to_service", "not_viable"])
+    confirm_close = st.checkbox("Confirmo cierre operativo y revision de retencion/borrado de datos.")
+    if st.button("Cerrar piloto", disabled=not close_reviewer.strip() or not close_notes.strip() or not confirm_close):
+        st.json(
+            run_close_pilot(
+                client_dir,
+                reviewer=close_reviewer,
+                notes=close_notes,
+                outcome=outcome,
+                confirm_close=confirm_close,
+            )
+        )
 
 
 def render_outputs(client_dir: Path) -> None:

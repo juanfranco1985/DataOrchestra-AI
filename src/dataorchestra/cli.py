@@ -14,6 +14,7 @@ from dataorchestra.integrity import fingerprint_files
 from dataorchestra.pdf import export_report_pdf
 from dataorchestra.privacy import scan_csv_files
 from dataorchestra.runs import archive_file, new_run_id, run_stage_dir
+from dataorchestra.runtime import close_pilot, default_runtime_dir, prepare_runtime
 from dataorchestra.states import DiagnosticStatus
 from dataorchestra.status import inspect_client_status
 from dataorchestra.validation import validate_client_raw
@@ -162,6 +163,27 @@ def run_export_pdf(
     return result
 
 
+def run_prepare_runtime(runtime_dir: str | Path | None = None) -> dict:
+    return prepare_runtime(runtime_dir)
+
+
+def run_close_pilot(client_dir: str | Path, reviewer: str, notes: str, outcome: str, confirm_close: bool) -> dict:
+    client_path = Path(client_dir)
+    result = close_pilot(client_path, reviewer=reviewer, notes=notes, outcome=outcome, confirm_close=confirm_close)
+    append_audit_event(
+        client_path / "logs" / "audit.jsonl",
+        "close_pilot",
+        str(result.get("client_id") or _read_client_id(client_path)),
+        str(result.get("status")),
+        {
+            "outcome": result.get("outcome"),
+            "closure_record": result.get("closure_record"),
+            "data_retention_action_required": bool(result.get("data_retention_action_required")),
+        },
+    )
+    return result
+
+
 def _read_client_id(client_path: Path) -> str:
     config_path = client_path / "client.yaml"
     if not config_path.exists():
@@ -181,6 +203,9 @@ def main() -> int:
     init_client.add_argument("--business-type", default="Pendiente")
     init_client.add_argument("--currency", default="ARS")
 
+    prepare_runtime_parser = sub.add_parser("prepare-runtime", help="Create a local runtime directory for real client data")
+    prepare_runtime_parser.add_argument("--runtime-dir", default=str(default_runtime_dir()))
+
     preflight = sub.add_parser("preflight", help="Run privacy and raw data validation checks")
     preflight.add_argument("--client-dir", required=True)
 
@@ -199,6 +224,13 @@ def main() -> int:
     export_pdf.add_argument("--output")
     export_pdf.add_argument("--browser-path")
 
+    close = sub.add_parser("close-pilot", help="Close a controlled pilot with an auditable record")
+    close.add_argument("--client-dir", required=True)
+    close.add_argument("--reviewer", required=True)
+    close.add_argument("--notes", required=True)
+    close.add_argument("--outcome", choices=["completed", "not_viable", "needs_follow_up", "converted_to_service"], required=True)
+    close.add_argument("--confirm-close", action="store_true")
+
     approve = sub.add_parser("approve", help="Approve a reviewed draft for controlled delivery")
     approve.add_argument("--client-dir", required=True)
     approve.add_argument("--reviewer", required=True)
@@ -216,6 +248,10 @@ def main() -> int:
         )
         print(json.dumps(result, indent=2, ensure_ascii=False))
         return 0 if result["can_continue"] else 2
+    if args.command == "prepare-runtime":
+        result = run_prepare_runtime(args.runtime_dir)
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        return 0
     if args.command == "preflight":
         report = run_preflight(args.client_dir)
         print(json.dumps(report, indent=2, ensure_ascii=False))
@@ -236,6 +272,10 @@ def main() -> int:
         result = run_export_pdf(args.client_dir, source=args.source, output=args.output, browser_path=args.browser_path)
         print(json.dumps(result, indent=2, ensure_ascii=False))
         return 0 if result["status"] == "pdf_exported" else 2
+    if args.command == "close-pilot":
+        result = run_close_pilot(args.client_dir, reviewer=args.reviewer, notes=args.notes, outcome=args.outcome, confirm_close=args.confirm_close)
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        return 0 if result["status"] == DiagnosticStatus.PILOT_CLOSED.value else 2
     if args.command == "approve":
         result = run_approval(args.client_dir, args.reviewer, args.notes, args.confirm_human_review)
         print(json.dumps(result, indent=2, ensure_ascii=False))

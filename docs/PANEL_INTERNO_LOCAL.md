@@ -28,6 +28,8 @@ http://localhost:8501
 ## Funciones incluidas
 
 - Crear cliente piloto.
+- Preparar runtime seguro.
+- Seleccionar raiz externa de clientes.
 - Seleccionar cliente.
 - Ver estado operativo y proxima accion.
 - Ver archivos raw esperados.
@@ -37,6 +39,7 @@ http://localhost:8501
 - Ejecutar full-run.
 - Aprobar entrega con revisor, notas y confirmacion humana.
 - Exportar PDF aprobado.
+- Cerrar piloto con registro.
 - Ver entregables y audit log.
 
 ## Reglas operativas

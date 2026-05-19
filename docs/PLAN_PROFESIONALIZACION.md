@@ -70,6 +70,16 @@ Objetivo: validar valor comercial real.
 - Medir si el cliente entiende las recomendaciones.
 - Decidir continuidad, ajuste o descarte.
 
+## Fase 5.5 - Seguridad de datos reales
+
+Objetivo: recibir datos reales sin mezclarlos con codigo, demo o entregables versionados.
+
+- Runtime externo al repositorio. Estado: implementado con `prepare-runtime`.
+- Politica operativa de datos reales. Estado: implementado.
+- Checklist previo a cliente real. Estado: implementado.
+- Cierre auditable de piloto. Estado: implementado con `close-pilot`.
+- Retencion o borrado manual posterior al cierre. Estado: documentado.
+
 ## Fase 6 - Producto comercial minimo
 
 Objetivo: solo despues de validar el piloto.

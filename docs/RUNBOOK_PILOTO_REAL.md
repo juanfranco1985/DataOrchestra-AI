@@ -8,6 +8,16 @@ Antes de recibir datos, completar o adaptar:
 
 - `templates/aceptacion_piloto_controlado.md`
 - `templates/checklist_recepcion_datos_cliente.md`
+- `templates/checklist_seguridad_pre_cliente_real.md`
+
+Para cliente real, crear o usar runtime externo:
+
+```powershell
+$env:PYTHONPATH="src"
+python -m dataorchestra.cli prepare-runtime --runtime-dir "C:\Documentos\DataOrchestra_Runtime"
+```
+
+No guardar datos reales dentro del repositorio.
 
 ## 2. Recepcion de datos
 
@@ -121,3 +131,11 @@ El comando se bloquea si no existe informe aprobado.
 ## 7. Cierre
 
 Registrar feedback del cliente, tiempos, errores, objeciones, utilidad percibida y decision de continuidad.
+
+Cerrar el piloto:
+
+```powershell
+python -m dataorchestra.cli close-pilot --client-dir clients/cliente_001 --reviewer "Nombre responsable" --notes "Cierre registrado" --outcome completed --confirm-close
+```
+
+Despues del cierre, revisar retencion o borrado segun `docs/POLITICA_DATOS_REALES.md`.

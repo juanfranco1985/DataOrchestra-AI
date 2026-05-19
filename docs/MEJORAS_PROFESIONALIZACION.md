@@ -116,5 +116,7 @@ Objetivo: poder vender pilotos con expectativa clara.
 - [x] Agregar pagina web de demo.
 - [x] Automatizar PDF.
 - [x] Crear panel interno privado.
+- [x] Crear runtime seguro para datos reales.
+- [x] Agregar cierre auditable de piloto.
 - [ ] Publicar web online.
 - [ ] Integrar formulario real.
