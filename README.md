@@ -118,6 +118,13 @@ Build de produccion:
 cmd /c npm.cmd run build
 ```
 
+Deploy publico preparado:
+
+- Workflow: `.github/workflows/deploy-web.yml`.
+- Hosting objetivo: GitHub Pages.
+- URL esperada: `https://juanfranco1985.github.io/DataOrchestra-AI/`.
+- Guia de activacion: `docs/DEPLOY_WEB_GITHUB_PAGES.md`.
+
 La web comunica el estado real del proyecto: servicio supervisado para diagnostico comercial de PyMEs, no SaaS ni plataforma autoservicio.
 
 Paginas incluidas:

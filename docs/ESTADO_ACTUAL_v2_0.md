@@ -1,6 +1,6 @@
 # Estado actual - DataOrchestra AI v2.0
 
-Fecha de corte: 2026-05-14
+Fecha de corte: 2026-05-19
 
 ## Veredicto
 
@@ -93,6 +93,8 @@ dataorchestra approve --client-dir clients/cliente_001 --reviewer "Nombre respon
 - Paquete comercial y aceptacion de piloto documentados.
 - Caso demo ficticio reproducible.
 - Web institucional integrada en el repositorio.
+- Deploy estatico de la web preparado para GitHub Pages.
+- Repositorio remoto GitHub integrado: `juanfranco1985/DataOrchestra-AI`.
 - Panel interno local para operar pilotos controlados.
 - Runtime externo para datos reales.
 - Cierre auditable de pilotos.
@@ -136,7 +138,8 @@ Ultima verificacion realizada:
 python -m pytest -q            -> 34 passed
 python -m compileall src tests -> OK
 CLI disponible                -> init-client, prepare-runtime, status, preflight, analyze, full-run, approve, export-pdf, close-pilot
-Web Next.js                   -> npm run build OK, 7 paginas estaticas
+Web Next.js                   -> npm run build OK, export estatico preparado
+Web GitHub Pages              -> build OK con basePath /DataOrchestra-AI
 Export PDF demo               -> OK con Microsoft Edge headless
 Panel interno local           -> compileall OK, helpers testeados
 ```
@@ -144,9 +147,9 @@ Panel interno local           -> compileall OK, helpers testeados
 ## Limites actuales
 
 - No hay validacion con cliente real todavia.
-- No hay repositorio Git formal inicializado/publicado; `.gitignore` y workflow CI ya estan preparados.
-- No hay contrato/aceptacion comercial versionada dentro de esta unidad.
-- No hay panel interno; la operacion sigue siendo por CLI.
+- GitHub Pages requiere activar `Settings -> Pages -> GitHub Actions` en el repositorio.
+- Hay aceptacion operativa de piloto, pero no contrato legal formal revisado.
+- El panel interno es local y operativo; todavia no es multiusuario ni tiene autenticacion propia.
 - El motor analitico es deterministico y basico; no reemplaza analisis experto ni garantiza resultados.
 - La exportacion PDF automatica esta integrada mediante navegador Chromium/Edge/Chrome local.
 - No hay mecanismo de entrega o marcado `delivered`; la entrega sigue siendo accion manual externa.
@@ -169,7 +172,7 @@ Panel interno local           -> compileall OK, helpers testeados
 
 No sumar mas complejidad tecnica antes del primer piloto real.
 
-El siguiente paso es ejecutar el flujo completo con un cliente real de bajo riesgo:
+El siguiente paso operativo es activar GitHub Pages para publicar la web institucional y ejecutar el flujo completo con un cliente real de bajo riesgo:
 
 ```text
 admision -> datos anonimizados -> preflight -> analyze -> revision humana -> approve -> entrega controlada -> feedback

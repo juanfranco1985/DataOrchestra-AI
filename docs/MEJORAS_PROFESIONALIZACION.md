@@ -55,6 +55,7 @@ Objetivo: mejorar percepcion profesional del entregable.
 Objetivo: convertir la web en una presencia comercial controlada.
 
 - Deploy publico.
+- Workflow de deploy en GitHub Pages.
 - Pagina de servicio.
 - Pagina de privacidad.
 - Caso demo publico.
@@ -118,5 +119,6 @@ Objetivo: poder vender pilotos con expectativa clara.
 - [x] Crear panel interno privado.
 - [x] Crear runtime seguro para datos reales.
 - [x] Agregar cierre auditable de piloto.
+- [x] Preparar deploy web en GitHub Pages.
 - [ ] Publicar web online.
 - [ ] Integrar formulario real.

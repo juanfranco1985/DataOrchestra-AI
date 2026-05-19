@@ -58,6 +58,36 @@ En PowerShell:
 cmd /c npm.cmd run build
 ```
 
+El build genera una exportacion estatica en `out/`, preparada para hosting estatico.
+
+## Deploy en GitHub Pages
+
+El repositorio principal incluye un workflow para publicar esta web en GitHub Pages:
+
+```text
+../.github/workflows/deploy-web.yml
+```
+
+URL esperada una vez activado Pages:
+
+```text
+https://juanfranco1985.github.io/DataOrchestra-AI/
+```
+
+Para probar localmente el mismo `basePath` usado por GitHub Pages:
+
+```powershell
+$env:GITHUB_PAGES="true"
+$env:NEXT_PUBLIC_BASE_PATH="/DataOrchestra-AI"
+cmd /c npm.cmd run build
+```
+
+La activacion en GitHub esta documentada en:
+
+```text
+../docs/DEPLOY_WEB_GITHUB_PAGES.md
+```
+
 ## Estructura
 
 ```text
@@ -97,6 +127,8 @@ dataorchestra-web/
 Versión v0.1: landing institucional de una página, sin backend y sin envío real de formulario.
 
 La version integrada agrega paginas informativas para servicio, privacidad y caso demo ficticio.
+
+Tambien queda preparada para deploy estatico en GitHub Pages.
 
 ## Próximos pasos
 

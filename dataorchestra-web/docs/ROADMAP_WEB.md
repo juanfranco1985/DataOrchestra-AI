@@ -1,5 +1,11 @@
 # Roadmap web
 
+## Estado de deploy
+
+- v0.1 landing institucional: implementada.
+- v0.1.1 deploy publico preparado: export estatico de Next.js y workflow de GitHub Pages implementados.
+- Pendiente operativo: activar Pages en GitHub con fuente `GitHub Actions`.
+
 ## v0.1 - Landing institucional
 
 Landing de una página para explicar el proyecto, su estado real, beneficios, privacidad y piloto controlado.

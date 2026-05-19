@@ -1,3 +1,5 @@
+import { siteHref } from "@/components/routes";
+
 const footerLinks = [
   { label: "Servicio", href: "/servicio" },
   { label: "Privacidad", href: "/privacidad" },
@@ -18,7 +20,7 @@ export function Footer() {
         </div>
         <nav className="flex flex-wrap gap-4 text-sm text-slate-300" aria-label="Navegación de pie">
           {footerLinks.map((item) => (
-            <a key={item.href} href={item.href} className="focus-ring rounded py-1 transition hover:text-white">
+            <a key={item.href} href={siteHref(item.href)} className="focus-ring rounded py-1 transition hover:text-white">
               {item.label}
             </a>
           ))}

@@ -21,6 +21,8 @@ Crear una primera presencia comercial profesional para explicar DataOrchestra AI
 - SEO básico en `app/layout.tsx`.
 - Diseño responsive con Tailwind CSS.
 - Documentación comercial y de diseño.
+- Export estatico de Next.js.
+- Workflow de GitHub Pages preparado.
 
 ## Qué no incluye
 
@@ -51,15 +53,15 @@ El proyecto se presenta como diagnóstico comercial controlado con datos anonimi
 - Formulario sin integración.
 - Sin analytics.
 - Sin páginas legales específicas.
-- Sin caso demo navegable.
 - Sin captación automatizada.
 - Sin sistema de gestión de leads.
+- GitHub Pages pendiente de activacion manual en el repositorio.
 
 ## Próximos pasos recomendados
 
 1. Validar el copy con potenciales clientes piloto.
-2. Integrar un formulario real.
-3. Crear una página de privacidad.
-4. Agregar un caso demo ficticio.
+2. Activar GitHub Pages con fuente `GitHub Actions`.
+3. Integrar un formulario real.
+4. Completar paginas legales especificas.
 5. Medir visitas y conversiones.
-6. Evaluar un panel privado solo después de validar pilotos reales.
+6. Evaluar un panel privado solo despues de validar pilotos reales.

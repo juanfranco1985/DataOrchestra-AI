@@ -1,4 +1,5 @@
 import { ArrowRight, CheckCircle2, FileText, Fingerprint, ShieldCheck } from "lucide-react";
+import { siteHref } from "@/components/routes";
 
 const controls = [
   { label: "Privacidad", icon: ShieldCheck },
@@ -11,7 +12,7 @@ export function Hero() {
     <section id="inicio" className="relative isolate overflow-hidden">
       <div className="hero-grid absolute inset-0 -z-10" aria-hidden="true" />
       <img
-        src="/images/diagnostic-signal.svg"
+        src={siteHref("/images/diagnostic-signal.svg")}
         alt=""
         className="pointer-events-none absolute right-0 top-12 -z-10 hidden w-[54rem] max-w-none opacity-45 lg:block"
         aria-hidden="true"
