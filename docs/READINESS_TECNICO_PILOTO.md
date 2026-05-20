@@ -24,6 +24,7 @@ python -m dataorchestra.cli readiness --client-dir "C:\Documentos\DataOrchestra_
 - Estado del preflight.
 - Existencia de borrador y bloqueo por revision humana.
 - Existencia de aprobacion humana si ya se llego a entrega.
+- Incidentes operativos abiertos.
 - Cierre operativo y revision de retencion si corresponde.
 - Documentacion critica del repositorio.
 - Advertencia si se intenta operar datos reales dentro de `clients/` del repositorio.
@@ -54,6 +55,8 @@ Ejecutar readiness:
 4. antes de aprobar entrega;
 5. antes de cerrar el piloto;
 6. despues de cualquier incidente operativo.
+
+Si hay incidentes abiertos con severidad `alta` o `media`, `readiness` queda bloqueado hasta ejecutar `resolve-incident`.
 
 ## Limite
 

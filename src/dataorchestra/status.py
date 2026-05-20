@@ -6,6 +6,7 @@ from typing import Any
 
 import yaml
 
+from dataorchestra.incidents import summarize_incidents
 from dataorchestra.states import DiagnosticStatus
 
 
@@ -22,17 +23,19 @@ def inspect_client_status(client_dir: str | Path) -> dict[str, Any]:
     config = _read_yaml(client_path / "client.yaml")
     raw_files = _raw_files_status(raw_dir)
     current_stage = _current_stage(raw_files, preflight, analysis, approval, closure, config)
+    incidents = summarize_incidents(client_path)
 
     return {
         "client_id": _client_id(client_path, config),
         "client_dir": str(client_path),
         "current_stage": current_stage,
-        "next_action": _next_action(current_stage),
+        "next_action": _incident_next_action(incidents) or _next_action(current_stage),
         "raw_files": raw_files,
         "preflight": _preflight_status(preflight),
         "analysis": _analysis_status(analysis),
         "approval": _approval_status(approval),
         "closure": _closure_status(closure),
+        "incidents": incidents,
         "last_audit_event": _last_audit_event(client_path / "logs" / "audit.jsonl"),
     }
 
@@ -74,6 +77,12 @@ def _next_action(stage: str) -> str:
         "preflight_required": "Ejecutar preflight antes de analizar.",
     }
     return actions.get(stage, "Revisar el estado operativo del cliente.")
+
+
+def _incident_next_action(incidents: dict[str, Any]) -> str | None:
+    if incidents.get("blocking_open_count", 0) > 0:
+        return "Resolver incidentes abiertos antes de continuar el flujo del cliente."
+    return None
 
 
 def _raw_files_status(raw_dir: Path) -> dict[str, Any]:

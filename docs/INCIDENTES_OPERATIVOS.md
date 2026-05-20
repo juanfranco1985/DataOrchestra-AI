@@ -96,6 +96,40 @@ Registrar:
 
 No registrar valores sensibles textuales.
 
+## Comando para registrar un incidente
+
+```powershell
+python -m dataorchestra.cli incident --client-dir clients/cliente_001 --type sensitive_data_detected --severity alta --responsible "Nombre responsable" --action-taken "Proceso detenido y pedido de version anonimizada" --requires-data-deletion --confirm-no-sensitive-values
+```
+
+Tipos permitidos:
+
+- `sensitive_data_detected`
+- `invalid_files`
+- `post_preflight_change`
+- `analysis_export_error`
+- `accidental_sensitive_submission`
+- `process_deviation`
+- `other`
+
+El comando genera:
+
+- `diagnostics/incidents/incident_<id>.json`
+- `diagnostics/incidents/incidents_index.json`
+- evento `incident_registered` en `logs/audit.jsonl`
+
+Los incidentes abiertos con severidad `alta` o `media` bloquean `readiness` hasta su resolucion.
+
+## Comando para resolver un incidente
+
+Usar el `incident_id` devuelto por el comando `incident`.
+
+```powershell
+python -m dataorchestra.cli resolve-incident --client-dir clients/cliente_001 --incident-id incident_20260520T123456000000Z --responsible "Nombre responsable" --resolution "Incidente mitigado y verificado" --confirm-no-sensitive-values
+```
+
+La resolucion no debe incluir emails, telefonos, documentos, cuentas, nombres personales ni valores sensibles. Registrar solo la decision operativa y la accion tomada.
+
 ## Comando recomendado antes de continuar
 
 ```powershell

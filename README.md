@@ -41,6 +41,8 @@ dataorchestra analyze --client-dir clients/cliente_001
 dataorchestra full-run --client-dir clients/cliente_001
 dataorchestra approve --client-dir clients/cliente_001 --reviewer "Nombre responsable" --notes "Revision humana completada" --confirm-human-review
 dataorchestra export-pdf --client-dir clients/cliente_001
+dataorchestra incident --client-dir clients/cliente_001 --type sensitive_data_detected --severity alta --responsible "Nombre responsable" --action-taken "Proceso detenido y pedido de version anonimizada" --confirm-no-sensitive-values
+dataorchestra resolve-incident --client-dir clients/cliente_001 --incident-id incident_20260520T123456000000Z --responsible "Nombre responsable" --resolution "Incidente mitigado y verificado" --confirm-no-sensitive-values
 dataorchestra close-pilot --client-dir clients/cliente_001 --reviewer "Nombre responsable" --notes "Cierre registrado" --outcome completed --confirm-close
 ```
 
@@ -59,6 +61,8 @@ python -m dataorchestra.cli analyze --client-dir clients/cliente_001
 python -m dataorchestra.cli full-run --client-dir clients/cliente_001
 python -m dataorchestra.cli approve --client-dir clients/cliente_001 --reviewer "Nombre responsable" --notes "Revision humana completada" --confirm-human-review
 python -m dataorchestra.cli export-pdf --client-dir clients/cliente_001
+python -m dataorchestra.cli incident --client-dir clients/cliente_001 --type invalid_files --severity media --responsible "Nombre responsable" --action-taken "Se pidio correccion de archivos" --confirm-no-sensitive-values
+python -m dataorchestra.cli resolve-incident --client-dir clients/cliente_001 --incident-id incident_20260520T123456000000Z --responsible "Nombre responsable" --resolution "Correccion recibida y verificada" --confirm-no-sensitive-values
 python -m dataorchestra.cli close-pilot --client-dir clients/cliente_001 --reviewer "Nombre responsable" --notes "Cierre registrado" --outcome completed --confirm-close
 ```
 
@@ -81,6 +85,8 @@ El comando `readiness` ejecuta un checklist tecnico y operativo antes de avanzar
 El comando `full-run` ejecuta `preflight` y, solo si esta listo, ejecuta `analyze`. No aprueba ni entrega informes; la aprobacion humana sigue siendo separada y obligatoria.
 
 Para datos reales, usar un runtime externo al repositorio. Ver `docs/RUNTIME_SEGURO_DATOS_REALES.md` y `docs/POLITICA_DATOS_REALES.md`.
+
+El comando `incident` registra incidentes operativos sin guardar valores sensibles. El comando `resolve-incident` cierra el incidente cuando ya fue mitigado. Los incidentes abiertos de severidad `alta` o `media` bloquean `readiness`.
 
 El comando `close-pilot` registra cierre operativo, resultado y obliga a revisar retencion o borrado. No borra datos automaticamente.
 

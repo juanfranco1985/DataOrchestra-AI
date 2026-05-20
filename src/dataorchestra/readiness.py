@@ -43,6 +43,7 @@ def inspect_readiness(client_dir: str | Path, repo_root: str | Path | None = Non
         checks.extend(_raw_file_checks(status))
         checks.extend(_preflight_checks(status))
         checks.extend(_review_gate_checks(status))
+        checks.extend(_incident_checks(status))
         checks.extend(_closure_checks(status))
     else:
         checks.append(
@@ -219,6 +220,35 @@ def _closure_checks(status: dict[str, Any]) -> list[ReadinessCheck]:
         ]
 
     return [_pass("pilot_closed", "closure", "El piloto esta cerrado.", {"outcome": closure.get("outcome")})]
+
+
+def _incident_checks(status: dict[str, Any]) -> list[ReadinessCheck]:
+    incidents = status.get("incidents", {})
+    if incidents.get("blocking_open_count", 0) > 0:
+        return [
+            _fail(
+                "blocking_incidents_open",
+                "incidents",
+                "Hay incidentes abiertos que bloquean el flujo.",
+                {
+                    "open_count": incidents.get("open_count"),
+                    "blocking_open_count": incidents.get("blocking_open_count"),
+                    "latest": incidents.get("latest"),
+                },
+            )
+        ]
+    if incidents.get("open_count", 0) > 0:
+        return [
+            _warn(
+                "incidents_open",
+                "incidents",
+                "Hay incidentes abiertos de baja severidad. Revisar antes de entregar.",
+                {"open_count": incidents.get("open_count"), "latest": incidents.get("latest")},
+            )
+        ]
+    if incidents.get("count", 0) > 0:
+        return [_pass("incidents_reviewed", "incidents", "No hay incidentes abiertos.", {"count": incidents.get("count")})]
+    return [_pass("no_incidents_registered", "incidents", "No hay incidentes registrados.", {})]
 
 
 def _repository_checks(repo_path: Path) -> list[ReadinessCheck]:

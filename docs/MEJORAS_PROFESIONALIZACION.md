@@ -126,5 +126,6 @@ Objetivo: poder vender pilotos con expectativa clara.
 - [x] Agregar FAQ comercial publica e interna.
 - [x] Agregar base publica de terminos y privacidad.
 - [x] Documentar incidentes operativos y readiness tecnico.
+- [x] Implementar registro y resolucion auditable de incidentes operativos.
 - [ ] Publicar web online.
 - [ ] Integrar backend, webhook o CRM.

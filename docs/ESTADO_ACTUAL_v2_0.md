@@ -1,6 +1,6 @@
 # Estado actual - DataOrchestra AI v2.0
 
-Fecha de corte: 2026-05-19
+Fecha de corte: 2026-05-20
 
 ## Veredicto
 
@@ -16,10 +16,13 @@ v2_0_primer_piloto_real_controlado/
     analytics/              Motor deterministico de diagnostico
     approval.py             Aprobacion humana auditable
     audit.py                Eventos JSONL de auditoria
-    cli.py                  Comandos preflight, analyze y approve
+    cli.py                  Comandos operativos del piloto controlado
+    incidents.py            Registro y resolucion auditable de incidentes
     integrity.py            Fingerprints SHA-256 de archivos raw
+    readiness.py            Checklist tecnico-operativo automatizado
     privacy.py              Escaneo de columnas y valores sensibles
     reporting.py            Render de borrador ejecutivo Markdown
+    status.py               Estado operativo y proxima accion
     clients.py              Creacion de espacios operativos por cliente
     runs.py                 Historial de artefactos por run_id
     states.py               Estados permitidos del diagnostico
@@ -104,6 +107,8 @@ dataorchestra approve --client-dir clients/cliente_001 --reviewer "Nombre respon
 - Tests automatizados de privacidad, validacion, integridad, analisis, reporte y aprobacion.
 - Readiness tecnico automatizado para bloquear o advertir antes de avanzar.
 - Procedimiento documentado de incidentes operativos.
+- Registro y resolucion auditable de incidentes operativos desde CLI.
+- Bloqueo de readiness si existen incidentes abiertos de severidad `alta` o `media`.
 
 ## Artefactos generados
 
@@ -135,15 +140,21 @@ Historial por corrida:
 - `runs/<run_id>/analysis/*`
 - `runs/<run_id>/approval/*`
 
+Incidentes:
+
+- `diagnostics/incidents/incident_<id>.json`
+- `diagnostics/incidents/incidents_index.json`
+- eventos `incident_registered` e `incident_resolved` en `logs/audit.jsonl`
+
 ## Validaciones tecnicas ejecutadas
 
 Ultima verificacion realizada:
 
 ```text
-python -m pytest -q            -> 38 passed
+python -m pytest -q            -> 43 passed
 python -m compileall src tests -> OK
-CLI disponible                -> init-client, prepare-runtime, status, readiness, preflight, analyze, full-run, approve, export-pdf, close-pilot
-Readiness tecnico             -> checks de workspace, raw, preflight, docs, revision y runtime
+CLI disponible                -> init-client, prepare-runtime, status, readiness, preflight, analyze, full-run, approve, export-pdf, incident, resolve-incident, close-pilot
+Readiness tecnico             -> checks de workspace, raw, preflight, docs, revision, incidentes y runtime
 Web Next.js                   -> npm run build OK, export estatico preparado
 Web GitHub Pages              -> build OK con basePath /DataOrchestra-AI
 Web FAQ comercial             -> ruta /faq incluida en export estatico

@@ -10,6 +10,7 @@ from dataorchestra.analytics import run_client_analysis
 from dataorchestra.approval import approve_for_delivery
 from dataorchestra.audit import append_audit_event
 from dataorchestra.clients import create_client_workspace
+from dataorchestra.incidents import INCIDENT_TYPES, SEVERITIES, register_incident, resolve_incident
 from dataorchestra.integrity import fingerprint_files
 from dataorchestra.pdf import export_report_pdf
 from dataorchestra.privacy import scan_csv_files
@@ -189,6 +190,75 @@ def run_close_pilot(client_dir: str | Path, reviewer: str, notes: str, outcome: 
     return result
 
 
+def run_incident(
+    client_dir: str | Path,
+    incident_type: str,
+    severity: str,
+    responsible: str,
+    action_taken: str,
+    notes: str = "",
+    flow_stage: str | None = None,
+    requires_data_deletion: bool = False,
+    confirm_no_sensitive_values: bool = False,
+) -> dict:
+    client_path = Path(client_dir)
+    result = register_incident(
+        client_path,
+        incident_type=incident_type,
+        severity=severity,
+        responsible=responsible,
+        action_taken=action_taken,
+        notes=notes,
+        flow_stage=flow_stage,
+        requires_data_deletion=requires_data_deletion,
+        confirm_no_sensitive_values=confirm_no_sensitive_values,
+    )
+    if result.get("status") == "incident_registered":
+        append_audit_event(
+            client_path / "logs" / "audit.jsonl",
+            "incident_registered",
+            str(result.get("client_id") or _read_client_id(client_path)),
+            str(result.get("severity")),
+            {
+                "incident_id": result.get("incident_id"),
+                "incident_type": result.get("incident_type"),
+                "flow_blocked": bool(result.get("flow_blocked")),
+                "requires_data_deletion": bool(result.get("requires_data_deletion")),
+            },
+        )
+    return result
+
+
+def run_resolve_incident(
+    client_dir: str | Path,
+    incident_id: str,
+    responsible: str,
+    resolution: str,
+    confirm_no_sensitive_values: bool = False,
+) -> dict:
+    client_path = Path(client_dir)
+    result = resolve_incident(
+        client_path,
+        incident_id=incident_id,
+        responsible=responsible,
+        resolution=resolution,
+        confirm_no_sensitive_values=confirm_no_sensitive_values,
+    )
+    if result.get("status") == "incident_resolved":
+        append_audit_event(
+            client_path / "logs" / "audit.jsonl",
+            "incident_resolved",
+            str(result.get("client_id") or _read_client_id(client_path)),
+            str(result.get("severity")),
+            {
+                "incident_id": result.get("incident_id"),
+                "incident_type": result.get("incident_type"),
+                "flow_blocked": False,
+            },
+        )
+    return result
+
+
 def _read_client_id(client_path: Path) -> str:
     config_path = client_path / "client.yaml"
     if not config_path.exists():
@@ -240,6 +310,24 @@ def main() -> int:
     close.add_argument("--outcome", choices=["completed", "not_viable", "needs_follow_up", "converted_to_service"], required=True)
     close.add_argument("--confirm-close", action="store_true")
 
+    incident = sub.add_parser("incident", help="Register an operational incident without storing sensitive values")
+    incident.add_argument("--client-dir", required=True)
+    incident.add_argument("--type", choices=sorted(INCIDENT_TYPES), required=True)
+    incident.add_argument("--severity", choices=sorted(SEVERITIES), required=True)
+    incident.add_argument("--responsible", required=True)
+    incident.add_argument("--action-taken", required=True)
+    incident.add_argument("--notes", default="")
+    incident.add_argument("--flow-stage")
+    incident.add_argument("--requires-data-deletion", action="store_true")
+    incident.add_argument("--confirm-no-sensitive-values", action="store_true")
+
+    resolve = sub.add_parser("resolve-incident", help="Resolve an open operational incident after mitigation")
+    resolve.add_argument("--client-dir", required=True)
+    resolve.add_argument("--incident-id", required=True)
+    resolve.add_argument("--responsible", required=True)
+    resolve.add_argument("--resolution", required=True)
+    resolve.add_argument("--confirm-no-sensitive-values", action="store_true")
+
     approve = sub.add_parser("approve", help="Approve a reviewed draft for controlled delivery")
     approve.add_argument("--client-dir", required=True)
     approve.add_argument("--reviewer", required=True)
@@ -289,6 +377,30 @@ def main() -> int:
         result = run_close_pilot(args.client_dir, reviewer=args.reviewer, notes=args.notes, outcome=args.outcome, confirm_close=args.confirm_close)
         print(json.dumps(result, indent=2, ensure_ascii=False))
         return 0 if result["status"] == DiagnosticStatus.PILOT_CLOSED.value else 2
+    if args.command == "incident":
+        result = run_incident(
+            args.client_dir,
+            incident_type=args.type,
+            severity=args.severity,
+            responsible=args.responsible,
+            action_taken=args.action_taken,
+            notes=args.notes,
+            flow_stage=args.flow_stage,
+            requires_data_deletion=args.requires_data_deletion,
+            confirm_no_sensitive_values=args.confirm_no_sensitive_values,
+        )
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        return 0 if result["status"] == "incident_registered" else 2
+    if args.command == "resolve-incident":
+        result = run_resolve_incident(
+            args.client_dir,
+            incident_id=args.incident_id,
+            responsible=args.responsible,
+            resolution=args.resolution,
+            confirm_no_sensitive_values=args.confirm_no_sensitive_values,
+        )
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        return 0 if result["status"] == "incident_resolved" else 2
     if args.command == "approve":
         result = run_approval(args.client_dir, args.reviewer, args.notes, args.confirm_human_review)
         print(json.dumps(result, indent=2, ensure_ascii=False))
