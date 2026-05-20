@@ -37,6 +37,7 @@ Objetivo: reducir dependencia de memoria, terminal manual y pasos sueltos.
 - Comando `full-run` para ejecutar preflight y analisis sin aprobar automaticamente.
 - Panel interno privado.
 - Estados visibles y proximas acciones.
+- Readiness tecnico automatizado antes de avanzar.
 - Bitacora operativa mas clara.
 
 ### 2. Entrega ejecutiva
@@ -111,6 +112,7 @@ Objetivo: poder vender pilotos con expectativa clara.
 
 - [x] Documentar roadmap de profesionalizacion.
 - [x] Implementar comando `status`.
+- [x] Implementar comando `readiness`.
 - [x] Implementar comando `full-run`.
 - [x] Agregar pagina web de servicio.
 - [x] Agregar pagina web de privacidad.
@@ -123,5 +125,6 @@ Objetivo: poder vender pilotos con expectativa clara.
 - [x] Crear formulario de contacto controlado por email.
 - [x] Agregar FAQ comercial publica e interna.
 - [x] Agregar base publica de terminos y privacidad.
+- [x] Documentar incidentes operativos y readiness tecnico.
 - [ ] Publicar web online.
 - [ ] Integrar backend, webhook o CRM.

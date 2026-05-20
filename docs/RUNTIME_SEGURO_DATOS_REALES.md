@@ -37,6 +37,7 @@ Luego usar:
 
 ```powershell
 python -m dataorchestra.cli status --client-dir "C:\Documentos\DataOrchestra_Runtime\clients\cliente_002"
+python -m dataorchestra.cli readiness --client-dir "C:\Documentos\DataOrchestra_Runtime\clients\cliente_002" --repo-root .
 python -m dataorchestra.cli full-run --client-dir "C:\Documentos\DataOrchestra_Runtime\clients\cliente_002"
 ```
 

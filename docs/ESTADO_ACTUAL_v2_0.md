@@ -102,6 +102,8 @@ dataorchestra approve --client-dir clients/cliente_001 --reviewer "Nombre respon
 - Runtime externo para datos reales.
 - Cierre auditable de pilotos.
 - Tests automatizados de privacidad, validacion, integridad, analisis, reporte y aprobacion.
+- Readiness tecnico automatizado para bloquear o advertir antes de avanzar.
+- Procedimiento documentado de incidentes operativos.
 
 ## Artefactos generados
 
@@ -138,9 +140,10 @@ Historial por corrida:
 Ultima verificacion realizada:
 
 ```text
-python -m pytest -q            -> 34 passed
+python -m pytest -q            -> 38 passed
 python -m compileall src tests -> OK
-CLI disponible                -> init-client, prepare-runtime, status, preflight, analyze, full-run, approve, export-pdf, close-pilot
+CLI disponible                -> init-client, prepare-runtime, status, readiness, preflight, analyze, full-run, approve, export-pdf, close-pilot
+Readiness tecnico             -> checks de workspace, raw, preflight, docs, revision y runtime
 Web Next.js                   -> npm run build OK, export estatico preparado
 Web GitHub Pages              -> build OK con basePath /DataOrchestra-AI
 Web FAQ comercial             -> ruta /faq incluida en export estatico

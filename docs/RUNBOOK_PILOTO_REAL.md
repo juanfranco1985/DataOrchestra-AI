@@ -47,6 +47,14 @@ $env:PYTHONPATH="src"
 python -m dataorchestra.cli status --client-dir clients/cliente_001
 ```
 
+Ejecutar readiness tecnico antes de avanzar:
+
+```powershell
+python -m dataorchestra.cli readiness --client-dir clients/cliente_001
+```
+
+Si `can_continue` es `false`, resolver bloqueos antes de ejecutar analisis, aprobacion o entrega.
+
 Ejecutar:
 
 ```powershell

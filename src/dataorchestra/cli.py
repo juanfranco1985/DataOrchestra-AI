@@ -13,6 +13,7 @@ from dataorchestra.clients import create_client_workspace
 from dataorchestra.integrity import fingerprint_files
 from dataorchestra.pdf import export_report_pdf
 from dataorchestra.privacy import scan_csv_files
+from dataorchestra.readiness import inspect_readiness
 from dataorchestra.runs import archive_file, new_run_id, run_stage_dir
 from dataorchestra.runtime import close_pilot, default_runtime_dir, prepare_runtime
 from dataorchestra.states import DiagnosticStatus
@@ -117,6 +118,10 @@ def run_status(client_dir: str | Path) -> dict:
     return inspect_client_status(client_dir)
 
 
+def run_readiness(client_dir: str | Path, repo_root: str | Path | None = ".") -> dict:
+    return inspect_readiness(client_dir, repo_root=repo_root)
+
+
 def run_full_run(client_dir: str | Path) -> dict:
     preflight = run_preflight(client_dir)
     if preflight["status"] != DiagnosticStatus.READY_FOR_ANALYSIS.value:
@@ -215,6 +220,10 @@ def main() -> int:
     status = sub.add_parser("status", help="Inspect client operational state and next action")
     status.add_argument("--client-dir", required=True)
 
+    readiness = sub.add_parser("readiness", help="Run technical readiness checks for a controlled pilot")
+    readiness.add_argument("--client-dir", required=True)
+    readiness.add_argument("--repo-root", default=".")
+
     full_run = sub.add_parser("full-run", help="Run preflight and analysis without approval")
     full_run.add_argument("--client-dir", required=True)
 
@@ -264,6 +273,10 @@ def main() -> int:
         result = run_status(args.client_dir)
         print(json.dumps(result, indent=2, ensure_ascii=False))
         return 0
+    if args.command == "readiness":
+        result = run_readiness(args.client_dir, repo_root=args.repo_root)
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        return 0 if result["can_continue"] else 2
     if args.command == "full-run":
         result = run_full_run(args.client_dir)
         print(json.dumps(result, indent=2, ensure_ascii=False))
