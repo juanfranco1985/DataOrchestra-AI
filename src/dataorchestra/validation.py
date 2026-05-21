@@ -6,24 +6,7 @@ import csv
 from pathlib import Path
 from typing import Iterable
 
-
-SCHEMAS = {
-    "ventas": {
-        "required": {"fecha", "producto", "categoria", "cantidad", "precio_unitario", "costo_unitario"},
-        "numeric_non_negative": {"cantidad", "precio_unitario", "costo_unitario"},
-        "date": {"fecha"},
-    },
-    "productos": {
-        "required": {"producto", "categoria", "precio_unitario", "costo_unitario"},
-        "numeric_non_negative": {"precio_unitario", "costo_unitario"},
-        "date": set(),
-    },
-    "stock": {
-        "required": {"producto", "stock_actual", "stock_minimo", "ventas_ultimos_30_dias"},
-        "numeric_non_negative": {"stock_actual", "stock_minimo", "ventas_ultimos_30_dias"},
-        "date": set(),
-    },
-}
+from dataorchestra.contracts import DATA_CONTRACT_VERSION, expected_files, validation_schema
 
 
 @dataclass(frozen=True)
@@ -42,11 +25,13 @@ class ValidationReport:
     can_continue: bool
     issues: list[ValidationIssue]
     files_checked: list[str]
+    contract_version: str = DATA_CONTRACT_VERSION
 
     def to_dict(self) -> dict:
         return {
             "status": self.status,
             "can_continue": self.can_continue,
+            "contract_version": self.contract_version,
             "issues": [asdict(item) for item in self.issues],
             "files_checked": self.files_checked,
         }
@@ -54,11 +39,7 @@ class ValidationReport:
 
 def validate_client_raw(raw_dir: str | Path) -> ValidationReport:
     raw = Path(raw_dir)
-    expected = {
-        "ventas": raw / "ventas.csv",
-        "productos": raw / "productos.csv",
-        "stock": raw / "stock.csv",
-    }
+    expected = {dataset: raw / file_name for dataset, file_name in expected_files().items()}
     issues: list[ValidationIssue] = []
     checked: list[str] = []
 
@@ -86,7 +67,7 @@ def validate_client_raw(raw_dir: str | Path) -> ValidationReport:
 
 
 def validate_csv_schema(path: str | Path, dataset: str) -> list[ValidationIssue]:
-    schema = SCHEMAS[dataset]
+    schema = validation_schema(dataset)
     file_path = Path(path)
     issues: list[ValidationIssue] = []
 

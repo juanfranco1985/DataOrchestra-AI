@@ -36,6 +36,7 @@ dataorchestra init-client --client-id cliente_002 --display-name "Cliente piloto
 dataorchestra prepare-runtime --runtime-dir "C:\Documentos\DataOrchestra_Runtime"
 dataorchestra status --client-dir clients/cliente_001
 dataorchestra readiness --client-dir clients/cliente_001
+dataorchestra data-contracts
 dataorchestra thresholds --client-dir clients/cliente_001
 dataorchestra preflight --client-dir clients/cliente_001
 dataorchestra data-quality --client-dir clients/cliente_001
@@ -58,6 +59,7 @@ python -m dataorchestra.cli init-client --client-id cliente_002 --display-name "
 python -m dataorchestra.cli prepare-runtime --runtime-dir "C:\Documentos\DataOrchestra_Runtime"
 python -m dataorchestra.cli status --client-dir clients/cliente_001
 python -m dataorchestra.cli readiness --client-dir clients/cliente_001
+python -m dataorchestra.cli data-contracts
 python -m dataorchestra.cli thresholds --client-dir clients/cliente_001
 python -m dataorchestra.cli preflight --client-dir clients/cliente_001
 python -m dataorchestra.cli data-quality --client-dir clients/cliente_001
@@ -85,6 +87,8 @@ Para operar mas de un cliente, crear una carpeta separada con `init-client`. No 
 El comando `status` muestra el estado operativo del cliente, archivos faltantes, preflight, analisis, aprobacion y proxima accion recomendada.
 
 El comando `readiness` ejecuta un checklist tecnico y operativo antes de avanzar con un piloto real. Ver `docs/READINESS_TECNICO_PILOTO.md`.
+
+El comando `data-contracts` muestra el contrato versionado vigente para `ventas.csv`, `productos.csv` y `stock.csv`. Ver `docs/CONTRATOS_DATOS_v1.md`.
 
 El comando `thresholds` muestra los umbrales activos por rubro o configuracion del cliente. El comando `data-quality` calcula un score de calidad de datos antes de interpretar el diagnostico. Ver `docs/CALIDAD_DATOS_Y_UMBRALES.md`.
 
@@ -194,6 +198,7 @@ Para preparar la conversacion comercial y la admision, usar:
 - `docs/PAQUETE_COMERCIAL_PILOTO.md`
 - `docs/FAQ_COMERCIAL_PILOTO.md`
 - `docs/TERMINOS_Y_PRIVACIDAD_WEB.md`
+- `docs/CONTRATOS_DATOS_v1.md`
 - `docs/READINESS_TECNICO_PILOTO.md`
 - `docs/CALIDAD_DATOS_Y_UMBRALES.md`
 - `docs/INCIDENTES_OPERATIVOS.md`

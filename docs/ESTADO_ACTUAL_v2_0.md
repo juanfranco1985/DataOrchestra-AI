@@ -17,6 +17,7 @@ v2_0_primer_piloto_real_controlado/
     approval.py             Aprobacion humana auditable
     audit.py                Eventos JSONL de auditoria
     cli.py                  Comandos operativos del piloto controlado
+    contracts.py            Contratos versionados de datos CSV
     data_quality.py         Score de calidad de datos
     incidents.py            Registro y resolucion auditable de incidentes
     integrity.py            Fingerprints SHA-256 de archivos raw
@@ -30,6 +31,7 @@ v2_0_primer_piloto_real_controlado/
     states.py               Estados permitidos del diagnostico
     validation.py           Validacion de esquemas CSV
   tests/                    Tests automatizados
+  contracts/                Contratos JSON versionados para archivos CSV
   clients/cliente_001/      Estructura del primer piloto
     raw/                    Entrada original, no editable
     processed/              Reservado para transformaciones futuras
@@ -77,6 +79,7 @@ dataorchestra approve --client-dir clients/cliente_001 --reviewer "Nombre respon
 ## Capacidades ya logradas
 
 - Validacion de archivos obligatorios: `ventas.csv`, `productos.csv`, `stock.csv`.
+- Contrato de datos versionado `1.0` para archivos CSV de entrada.
 - Validacion de columnas requeridas, fechas ISO y valores numericos no negativos.
 - Deteccion bloqueante de datos sensibles por nombres de columnas y patrones de valores.
 - Fingerprints SHA-256 de archivos `raw/`.
@@ -120,6 +123,8 @@ Preflight:
 
 - `diagnostics/preflight/preflight_report.json`
 - `logs/audit.jsonl`
+- `validation.contract_version`
+- `data_contract.version`
 
 Analisis:
 
@@ -163,9 +168,9 @@ Calidad de datos:
 Ultima verificacion realizada:
 
 ```text
-python -m pytest -q            -> 53 passed
+python -m pytest -q            -> 57 passed
 python -m compileall src tests -> OK
-CLI disponible                -> init-client, prepare-runtime, status, readiness, thresholds, data-quality, preflight, analyze, full-run, approve, export-pdf, incident, resolve-incident, close-pilot
+CLI disponible                -> init-client, prepare-runtime, status, readiness, data-contracts, thresholds, data-quality, preflight, analyze, full-run, approve, export-pdf, incident, resolve-incident, close-pilot
 Readiness tecnico             -> checks de workspace, raw, preflight, docs, revision, incidentes y runtime
 Web Next.js                   -> npm run build OK, export estatico preparado
 Web GitHub Pages              -> build OK con basePath /DataOrchestra-AI

@@ -10,6 +10,7 @@ from dataorchestra.analytics import run_client_analysis
 from dataorchestra.approval import approve_for_delivery
 from dataorchestra.audit import append_audit_event
 from dataorchestra.clients import create_client_workspace
+from dataorchestra.contracts import DATA_CONTRACTS, DATA_CONTRACT_VERSION, expected_files, export_contracts_payload
 from dataorchestra.data_quality import assess_data_quality
 from dataorchestra.incidents import INCIDENT_TYPES, SEVERITIES, register_incident, resolve_incident
 from dataorchestra.integrity import fingerprint_files
@@ -67,6 +68,10 @@ def run_preflight(client_dir: str | Path) -> dict:
         "status": status,
         "privacy": privacy.to_dict(),
         "validation": validation.to_dict(),
+        "data_contract": {
+            "version": DATA_CONTRACT_VERSION,
+            "required_files": list(expected_files().values()),
+        },
         "raw_files": {
             "count": len(raw_fingerprints_after),
             "fingerprints": raw_fingerprints_after,
@@ -156,6 +161,13 @@ def run_thresholds(client_dir: str | Path) -> dict:
         "status": "thresholds_resolved",
         "client_dir": str(Path(client_dir)),
         **result,
+    }
+
+
+def run_data_contracts(dataset: str | None = None) -> dict:
+    return {
+        "status": "data_contracts_ready",
+        **export_contracts_payload(dataset),
     }
 
 
@@ -336,6 +348,9 @@ def main() -> int:
     thresholds = sub.add_parser("thresholds", help="Show the active analytics thresholds for a client")
     thresholds.add_argument("--client-dir", required=True)
 
+    data_contracts = sub.add_parser("data-contracts", help="Show versioned CSV data contracts")
+    data_contracts.add_argument("--dataset", choices=sorted(DATA_CONTRACTS))
+
     full_run = sub.add_parser("full-run", help="Run preflight and analysis without approval")
     full_run.add_argument("--client-dir", required=True)
 
@@ -413,6 +428,10 @@ def main() -> int:
         return 0 if result["can_support_diagnostic"] else 2
     if args.command == "thresholds":
         result = run_thresholds(args.client_dir)
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        return 0
+    if args.command == "data-contracts":
+        result = run_data_contracts(args.dataset)
         print(json.dumps(result, indent=2, ensure_ascii=False))
         return 0
     if args.command == "full-run":

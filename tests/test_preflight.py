@@ -37,6 +37,8 @@ def test_preflight_ready_report_includes_raw_fingerprints_and_audit_log(tmp_path
 
     assert report["client_id"] == "cliente_test"
     assert report["status"] == "ready_for_analysis"
+    assert report["data_contract"]["version"] == "1.0"
+    assert report["validation"]["contract_version"] == "1.0"
     assert report["run_id"]
     assert report["raw_files_were_modified"] is False
     assert report["raw_files"]["count"] == 3

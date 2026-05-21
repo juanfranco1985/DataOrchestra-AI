@@ -16,6 +16,7 @@ CRITICAL_DOCS = (
     "docs/POLITICA_DATOS_REALES.md",
     "docs/INCIDENTES_OPERATIVOS.md",
     "docs/CALIDAD_DATOS_Y_UMBRALES.md",
+    "docs/CONTRATOS_DATOS_v1.md",
 )
 
 

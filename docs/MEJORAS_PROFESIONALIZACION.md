@@ -129,5 +129,6 @@ Objetivo: poder vender pilotos con expectativa clara.
 - [x] Implementar registro y resolucion auditable de incidentes operativos.
 - [x] Implementar score de calidad de datos.
 - [x] Implementar umbrales configurables por rubro.
+- [x] Implementar contratos de datos versionados v1.0.
 - [ ] Publicar web online.
 - [ ] Integrar backend, webhook o CRM.

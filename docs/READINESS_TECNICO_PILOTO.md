@@ -21,6 +21,7 @@ python -m dataorchestra.cli readiness --client-dir "C:\Documentos\DataOrchestra_
 - Estructura de carpetas del cliente.
 - Existencia de `client.yaml`.
 - Presencia de `ventas.csv`, `productos.csv` y `stock.csv`.
+- Existencia de documentacion de contratos de datos.
 - Estado del preflight.
 - Score de calidad de datos.
 - Existencia de borrador y bloqueo por revision humana.
