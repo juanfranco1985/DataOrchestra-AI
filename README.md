@@ -90,6 +90,8 @@ El comando `readiness` ejecuta un checklist tecnico y operativo antes de avanzar
 
 El comando `data-contracts` muestra el contrato versionado vigente para `ventas.csv`, `productos.csv` y `stock.csv`. Ver `docs/CONTRATOS_DATOS_v1.md`.
 
+El `preflight` aplica validacion avanzada de consistencia comercial sobre los CSV: productos vendidos fuera de catalogo, fechas fuera de rango, margenes imposibles, duplicados, stock riesgoso, categorias inconsistentes y nombres de producto casi iguales. Ver `docs/VALIDACION_AVANZADA_DATOS.md`.
+
 El comando `thresholds` muestra los umbrales activos por rubro o configuracion del cliente. El comando `data-quality` calcula un score de calidad de datos antes de interpretar el diagnostico. Ver `docs/CALIDAD_DATOS_Y_UMBRALES.md`.
 
 El comando `full-run` ejecuta `preflight` y, solo si esta listo, ejecuta `analyze`. No aprueba ni entrega informes; la aprobacion humana sigue siendo separada y obligatoria.
@@ -199,6 +201,7 @@ Para preparar la conversacion comercial y la admision, usar:
 - `docs/FAQ_COMERCIAL_PILOTO.md`
 - `docs/TERMINOS_Y_PRIVACIDAD_WEB.md`
 - `docs/CONTRATOS_DATOS_v1.md`
+- `docs/VALIDACION_AVANZADA_DATOS.md`
 - `docs/READINESS_TECNICO_PILOTO.md`
 - `docs/CALIDAD_DATOS_Y_UMBRALES.md`
 - `docs/INCIDENTES_OPERATIVOS.md`

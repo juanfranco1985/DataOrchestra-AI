@@ -72,3 +72,18 @@ def test_preflight_privacy_finding_blocks_before_data_fix_status(tmp_path: Path)
 
     assert report["status"] == "privacy_review_required"
     assert report["privacy"]["safe_to_continue"] is False
+
+
+def test_preflight_blocks_when_advanced_validation_finds_high_issue(tmp_path: Path):
+    client_dir = tmp_path / "cliente_test"
+    write_valid_client(client_dir)
+    (client_dir / "raw" / "ventas.csv").write_text(
+        "fecha,producto,categoria,cantidad,precio_unitario,costo_unitario\n"
+        "2026-01-01,Producto No Catalogado,Categoria 1,1,100,70\n",
+        encoding="utf-8",
+    )
+
+    report = run_preflight(client_dir)
+
+    assert report["status"] == "data_fix_required"
+    assert any(issue["code"] == "sold_product_missing_from_catalog" for issue in report["validation"]["issues"])

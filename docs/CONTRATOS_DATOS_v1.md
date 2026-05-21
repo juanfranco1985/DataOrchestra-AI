@@ -85,6 +85,8 @@ El `preflight` valida contra este contrato y registra:
 
 Si falta un archivo, una columna obligatoria o un valor no cumple tipo/regla minima, el flujo queda en `data_fix_required`.
 
+Despues de validar el contrato, el `preflight` ejecuta validacion avanzada de consistencia comercial. Ver `docs/VALIDACION_AVANZADA_DATOS.md`.
+
 ## Relacion con calidad de datos
 
 El contrato valida estructura minima. El score de calidad de datos evalua consistencia adicional:

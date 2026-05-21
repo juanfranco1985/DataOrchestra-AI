@@ -98,12 +98,12 @@ def test_readiness_blocks_when_data_quality_is_below_target(tmp_path: Path):
     )
     (raw_dir / "productos.csv").write_text(
         "producto,categoria,precio_unitario,costo_unitario\n"
-        "Producto A,Categoria 1,100,70\n",
+        "Producto X,Categoria 1,100,0\n",
         encoding="utf-8",
     )
     (raw_dir / "stock.csv").write_text(
         "producto,stock_actual,stock_minimo,ventas_ultimos_30_dias\n"
-        "Producto A,10,2,4\n",
+        "Producto X,10,2,0\n",
         encoding="utf-8",
     )
     assert run_preflight(client_dir)["status"] == "ready_for_analysis"

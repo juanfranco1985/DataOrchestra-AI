@@ -130,5 +130,6 @@ Objetivo: poder vender pilotos con expectativa clara.
 - [x] Implementar score de calidad de datos.
 - [x] Implementar umbrales configurables por rubro.
 - [x] Implementar contratos de datos versionados v1.0.
+- [x] Implementar validacion avanzada de consistencia comercial.
 - [ ] Publicar web online.
 - [ ] Integrar backend, webhook o CRM.
