@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from dataorchestra.confidence import apply_alert_confidence
 from dataorchestra.data_quality import assess_data_quality
 from dataorchestra.integrity import fingerprint_files
 from dataorchestra.periods import compare_sales_periods
@@ -76,6 +77,7 @@ def run_client_analysis(client_dir: str | Path, thresholds: dict[str, float] | N
         },
     }
     alerts = _build_alerts(concentration, low_margin, low_stock, excess_stock, active_thresholds)
+    alerts = apply_alert_confidence(alerts, sales_rows, products, stock_rows, data_quality)
     recommendations = _build_recommendations(alerts)
     raw_fingerprints = fingerprint_files(raw_dir.glob("*.csv"))
     draft_json_path = reports_dir / "diagnostico_borrador.json"
@@ -356,7 +358,13 @@ def _build_alerts(concentration: dict, low_margin: list[dict], low_stock: list[d
                 "item": "Top productos",
                 "description": f"Los principales productos concentran {concentration['ratio']:.1%} de la facturacion.",
                 "suggested_action": "Monitorear stock, precio y costo de productos criticos.",
-                "evidence": {"metric": "concentration.ratio", "value": concentration["ratio"], "threshold": thresholds["revenue_concentration_warning"]},
+                "evidence": {
+                    "metric": "concentration.ratio",
+                    "value": concentration["ratio"],
+                    "threshold": thresholds["revenue_concentration_warning"],
+                    "top_n": thresholds["revenue_concentration_top_n"],
+                    "source": "ventas.csv",
+                },
             }
         )
 

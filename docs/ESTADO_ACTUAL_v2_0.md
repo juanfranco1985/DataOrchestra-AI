@@ -17,6 +17,7 @@ v2_0_primer_piloto_real_controlado/
     approval.py             Aprobacion humana auditable
     audit.py                Eventos JSONL de auditoria
     cli.py                  Comandos operativos del piloto controlado
+    confidence.py           Score de confianza operativa por hallazgo
     contracts.py            Contratos versionados de datos CSV
     data_quality.py         Score de calidad de datos
     incidents.py            Registro y resolucion auditable de incidentes
@@ -89,6 +90,7 @@ dataorchestra approve --client-dir clients/cliente_001 --reviewer "Nombre respon
 - Motor analitico basico para ventas, costos, margen, ticket promedio, stock, concentracion, top productos, ventas por categoria y ventas por mes.
 - Comparacion por periodos: ultimo mes observado vs mes anterior y ultimos 30 dias vs 30 dias previos.
 - Alertas de bajo margen, stock bajo, exceso de stock y concentracion de facturacion.
+- Nivel de confianza por alerta, con score, motivos y limitaciones.
 - Score de calidad de datos con observaciones trazables.
 - Umbrales analiticos por rubro y overrides por cliente.
 - Recomendaciones asociadas a alertas/evidencia.
@@ -161,6 +163,13 @@ Incidentes:
 - `diagnostics/incidents/incidents_index.json`
 - eventos `incident_registered` e `incident_resolved` en `logs/audit.jsonl`
 
+Confianza por hallazgo:
+
+- incluida dentro de `diagnostics/analysis/alerts.json`
+- incluida dentro de `reports/diagnostico_borrador.json`
+- visible en `reports/diagnostico_borrador.md`
+- visible en `reports/diagnostico_borrador.html`
+
 Calidad de datos:
 
 - `diagnostics/data_quality/data_quality_report.json`
@@ -172,12 +181,13 @@ Calidad de datos:
 Ultima verificacion realizada:
 
 ```text
-python -m pytest -q            -> 62 passed
+python -m pytest -q            -> 64 passed
 python -m compileall src tests -> OK
 CLI disponible                -> init-client, prepare-runtime, status, readiness, data-contracts, thresholds, data-quality, preflight, analyze, full-run, approve, export-pdf, incident, resolve-incident, close-pilot
 Readiness tecnico             -> checks de workspace, raw, preflight, docs, revision, incidentes y runtime
 Validacion avanzada           -> fechas fuera de rango, catalogo, margen, duplicados, stock, categorias y nombres similares
 Comparacion por periodos      -> ultimo mes observado y ventana movil de 30 dias
+Confianza por hallazgo        -> score, nivel, motivos y limitaciones por alerta
 Web Next.js                   -> npm run build OK, export estatico preparado
 Web GitHub Pages              -> build OK con basePath /DataOrchestra-AI
 Web FAQ comercial             -> ruta /faq incluida en export estatico

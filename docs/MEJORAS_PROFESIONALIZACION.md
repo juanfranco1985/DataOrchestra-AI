@@ -83,6 +83,7 @@ Objetivo: aumentar valor sin prometer prediccion ni automatizacion total.
 - Validaciones de calidad de datos mas profundas.
 - Explicacion automatica de hallazgos.
 - Comparacion por periodos.
+- Confianza operativa por hallazgo.
 - Seguimiento de recomendaciones.
 - Historico mensual.
 
@@ -132,5 +133,6 @@ Objetivo: poder vender pilotos con expectativa clara.
 - [x] Implementar contratos de datos versionados v1.0.
 - [x] Implementar validacion avanzada de consistencia comercial.
 - [x] Implementar comparacion por periodos.
+- [x] Implementar confianza operativa por hallazgo.
 - [ ] Publicar web online.
 - [ ] Integrar backend, webhook o CRM.

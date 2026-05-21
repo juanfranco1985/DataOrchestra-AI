@@ -45,6 +45,7 @@ def render_markdown_report(analysis: dict) -> str:
     if alerts:
         for alert in alerts:
             evidence = alert.get("evidence", {})
+            confidence_lines = _render_markdown_confidence(alert.get("confidence"))
             lines.extend(
                 [
                     f"- **{alert['priority']} | {alert['type']} | {alert['item']}**",
@@ -53,6 +54,7 @@ def render_markdown_report(analysis: dict) -> str:
                     f"  - Evidencia: {_format_evidence(evidence)}",
                 ]
             )
+            lines.extend(confidence_lines)
     else:
         lines.append("- No se generaron alertas con los umbrales actuales.")
 
@@ -224,6 +226,8 @@ def render_html_report(analysis: dict, approval: dict | None = None) -> str:
     .alert, .recommendation {{ padding: 16px; margin-top: 12px; }}
     .priority {{ color: var(--cyan); font-weight: 700; }}
     .evidence {{ color: var(--muted); font-size: 12px; }}
+    .confidence {{ margin-top: 10px; color: var(--muted); font-size: 13px; }}
+    .confidence ul {{ margin: 6px 0 0; padding-left: 18px; }}
     .controls {{ display: grid; gap: 10px; }}
     .control {{ padding: 12px; font-family: Consolas, monospace; font-size: 12px; word-break: break-word; }}
     .approval {{ background: #f0fdf4; }}
@@ -325,6 +329,27 @@ def _format_evidence(evidence: dict) -> str:
         if key in evidence:
             parts.append(f"{key}={evidence[key]}")
     return "; ".join(parts) if parts else "sin_evidencia_registrada"
+
+
+def _format_confidence(confidence: dict | None) -> str:
+    if not confidence:
+        return "sin_score"
+    level = confidence.get("level", "sin_nivel")
+    score = confidence.get("score", "sin_score")
+    return f"{level} ({score}/100)"
+
+
+def _render_markdown_confidence(confidence: dict | None) -> list[str]:
+    if not confidence:
+        return []
+    lines = [f"  - Confianza: {_format_confidence(confidence)}"]
+    reasons = confidence.get("reasons") or []
+    limitations = confidence.get("limitations") or []
+    if reasons:
+        lines.append(f"  - Motivos: {'; '.join(str(item) for item in reasons[:3])}")
+    if limitations:
+        lines.append(f"  - Limitaciones de confianza: {'; '.join(str(item) for item in limitations[:3])}")
+    return lines
 
 
 def _quality_label(data_quality: dict) -> str:
@@ -441,6 +466,7 @@ def _render_html_alerts(alerts: list[dict]) -> str:
     output = []
     for alert in alerts:
         evidence = _format_evidence(alert.get("evidence", {}))
+        confidence = _render_html_confidence(alert.get("confidence"))
         output.append(
             f"""
             <article class="alert">
@@ -448,10 +474,29 @@ def _render_html_alerts(alerts: list[dict]) -> str:
               <p>{_html(alert["description"])}</p>
               <p><strong>Accion sugerida:</strong> {_html(alert["suggested_action"])}</p>
               <p class="evidence">Evidencia: {_html(evidence)}</p>
+              {confidence}
             </article>
             """
         )
     return "".join(output)
+
+
+def _render_html_confidence(confidence: dict | None) -> str:
+    if not confidence:
+        return ""
+    reasons = confidence.get("reasons") or []
+    limitations = confidence.get("limitations") or []
+    reason_items = "".join(f"<li>{_html(item)}</li>" for item in reasons[:3])
+    limitation_items = "".join(f"<li>{_html(item)}</li>" for item in limitations[:3])
+    reason_block = f"<p><strong>Motivos:</strong></p><ul>{reason_items}</ul>" if reason_items else ""
+    limitation_block = f"<p><strong>Limitaciones:</strong></p><ul>{limitation_items}</ul>" if limitation_items else ""
+    return f"""
+      <div class="confidence">
+        <strong>Confianza:</strong> {_html(_format_confidence(confidence))}
+        {reason_block}
+        {limitation_block}
+      </div>
+    """
 
 
 def _render_html_recommendations(recommendations: list[dict]) -> str:

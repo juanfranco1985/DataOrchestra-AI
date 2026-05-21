@@ -65,6 +65,8 @@ def test_analysis_generates_metrics_alerts_recommendations_and_draft(tmp_path: P
         "Stock bajo",
     }
     assert all(alert["evidence"] for alert in result["alerts"])
+    assert all(alert["confidence"]["level"] in {"alta", "media", "baja"} for alert in result["alerts"])
+    assert all(0 <= alert["confidence"]["score"] <= 100 for alert in result["alerts"])
     assert all("evidence_alert_ids" in recommendation for recommendation in result["recommendations"])
 
     draft_path = client_dir / "reports" / "diagnostico_borrador.json"
@@ -87,6 +89,7 @@ def test_analysis_generates_metrics_alerts_recommendations_and_draft(tmp_path: P
     assert "## Umbrales aplicados" in markdown
     assert "no entregar al cliente sin revision humana" in markdown
     assert "## Alertas" in markdown
+    assert "Confianza:" in markdown
     assert "## Recomendaciones" in markdown
     assert "sha256" in markdown
 
