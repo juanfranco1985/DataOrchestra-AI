@@ -52,6 +52,8 @@ def test_analysis_generates_metrics_alerts_recommendations_and_draft(tmp_path: P
     assert result["metrics"]["stock"]["valor_stock_total"] == 8100
     assert result["metrics"]["stock"]["productos_stock_bajo"] == 1
     assert result["metrics"]["stock"]["productos_exceso"] == 1
+    assert result["period_comparison"]["available"] is True
+    assert result["metrics"]["period_comparison"]["comparison_count"] >= 1
     assert result["data_quality"]["score"] >= 70
     assert result["metrics"]["data_quality"]["level"] == result["data_quality"]["level"]
     assert result["threshold_config"]["profile"] == "default"
@@ -76,9 +78,11 @@ def test_analysis_generates_metrics_alerts_recommendations_and_draft(tmp_path: P
     assert Path(result["outputs"]["archived"]["draft_markdown"]).exists()
     assert Path(result["outputs"]["archived"]["draft_html"]).exists()
     assert Path(result["outputs"]["archived"]["data_quality"]).exists()
+    assert Path(result["outputs"]["archived"]["period_comparison"]).exists()
     assert Path(result["outputs"]["archived"]["threshold_config"]).exists()
     assert Path(result["outputs"]["archived"]["analysis_summary"]).exists()
     assert "**Estado:** pending_human_review" in markdown
+    assert "## Comparacion por periodos" in markdown
     assert "## Calidad de datos" in markdown
     assert "## Umbrales aplicados" in markdown
     assert "no entregar al cliente sin revision humana" in markdown

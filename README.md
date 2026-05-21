@@ -94,6 +94,8 @@ El `preflight` aplica validacion avanzada de consistencia comercial sobre los CS
 
 El comando `thresholds` muestra los umbrales activos por rubro o configuracion del cliente. El comando `data-quality` calcula un score de calidad de datos antes de interpretar el diagnostico. Ver `docs/CALIDAD_DATOS_Y_UMBRALES.md`.
 
+El analisis incluye comparacion por periodos: ultimo mes observado vs mes anterior observado y ultimos 30 dias vs 30 dias previos. Ver `docs/COMPARACION_PERIODOS.md`.
+
 El comando `full-run` ejecuta `preflight` y, solo si esta listo, ejecuta `analyze`. No aprueba ni entrega informes; la aprobacion humana sigue siendo separada y obligatoria.
 
 Para datos reales, usar un runtime externo al repositorio. Ver `docs/RUNTIME_SEGURO_DATOS_REALES.md` y `docs/POLITICA_DATOS_REALES.md`.
@@ -202,6 +204,7 @@ Para preparar la conversacion comercial y la admision, usar:
 - `docs/TERMINOS_Y_PRIVACIDAD_WEB.md`
 - `docs/CONTRATOS_DATOS_v1.md`
 - `docs/VALIDACION_AVANZADA_DATOS.md`
+- `docs/COMPARACION_PERIODOS.md`
 - `docs/READINESS_TECNICO_PILOTO.md`
 - `docs/CALIDAD_DATOS_Y_UMBRALES.md`
 - `docs/INCIDENTES_OPERATIVOS.md`

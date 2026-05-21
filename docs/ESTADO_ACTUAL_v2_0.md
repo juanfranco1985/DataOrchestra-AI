@@ -21,6 +21,7 @@ v2_0_primer_piloto_real_controlado/
     data_quality.py         Score de calidad de datos
     incidents.py            Registro y resolucion auditable de incidentes
     integrity.py            Fingerprints SHA-256 de archivos raw
+    periods.py              Comparacion de ventas y margen por periodos
     readiness.py            Checklist tecnico-operativo automatizado
     privacy.py              Escaneo de columnas y valores sensibles
     reporting.py            Render de borrador ejecutivo Markdown
@@ -86,6 +87,7 @@ dataorchestra approve --client-dir clients/cliente_001 --reviewer "Nombre respon
 - Fingerprints SHA-256 de archivos `raw/`.
 - Bloqueo del analisis si los CSV cambian despues del preflight aprobado.
 - Motor analitico basico para ventas, costos, margen, ticket promedio, stock, concentracion, top productos, ventas por categoria y ventas por mes.
+- Comparacion por periodos: ultimo mes observado vs mes anterior y ultimos 30 dias vs 30 dias previos.
 - Alertas de bajo margen, stock bajo, exceso de stock y concentracion de facturacion.
 - Score de calidad de datos con observaciones trazables.
 - Umbrales analiticos por rubro y overrides por cliente.
@@ -133,6 +135,7 @@ Analisis:
 - `diagnostics/analysis/alerts.json`
 - `diagnostics/analysis/recommendations.json`
 - `diagnostics/analysis/data_quality.json`
+- `diagnostics/analysis/period_comparison.json`
 - `diagnostics/analysis/threshold_config.json`
 - `diagnostics/analysis/analysis_summary.json`
 - `reports/diagnostico_borrador.json`
@@ -169,11 +172,12 @@ Calidad de datos:
 Ultima verificacion realizada:
 
 ```text
-python -m pytest -q            -> 60 passed
+python -m pytest -q            -> 62 passed
 python -m compileall src tests -> OK
 CLI disponible                -> init-client, prepare-runtime, status, readiness, data-contracts, thresholds, data-quality, preflight, analyze, full-run, approve, export-pdf, incident, resolve-incident, close-pilot
 Readiness tecnico             -> checks de workspace, raw, preflight, docs, revision, incidentes y runtime
 Validacion avanzada           -> fechas fuera de rango, catalogo, margen, duplicados, stock, categorias y nombres similares
+Comparacion por periodos      -> ultimo mes observado y ventana movil de 30 dias
 Web Next.js                   -> npm run build OK, export estatico preparado
 Web GitHub Pages              -> build OK con basePath /DataOrchestra-AI
 Web FAQ comercial             -> ruta /faq incluida en export estatico

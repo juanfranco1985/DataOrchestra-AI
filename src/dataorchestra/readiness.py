@@ -18,6 +18,7 @@ CRITICAL_DOCS = (
     "docs/CALIDAD_DATOS_Y_UMBRALES.md",
     "docs/CONTRATOS_DATOS_v1.md",
     "docs/VALIDACION_AVANZADA_DATOS.md",
+    "docs/COMPARACION_PERIODOS.md",
 )
 
 

@@ -9,6 +9,7 @@ def render_markdown_report(analysis: dict) -> str:
     profitability = metrics["profitability"]
     stock = metrics["stock"]
     concentration = metrics["concentration"]
+    period_comparison = analysis.get("period_comparison") or metrics.get("period_comparison") or {}
     data_quality = analysis.get("data_quality") or metrics.get("data_quality") or {}
     threshold_config = analysis.get("threshold_config") or {}
     alerts = analysis["alerts"]
@@ -33,6 +34,7 @@ def render_markdown_report(analysis: dict) -> str:
         f"- Productos con stock bajo: {stock['productos_stock_bajo']}",
         f"- Productos con exceso de stock: {stock['productos_exceso']}",
         f"- Concentracion top {concentration['top_n']}: {_percent(concentration['ratio'])}",
+        f"- Comparaciones por periodo: {_period_availability_label(period_comparison)}",
         f"- Calidad de datos: {_quality_label(data_quality)}",
         f"- Perfil de umbrales: {_threshold_profile_label(threshold_config)}",
         "",
@@ -64,6 +66,9 @@ def render_markdown_report(analysis: dict) -> str:
                 f"  - Evidencia asociada: {evidence_ids}",
             ]
         )
+
+    lines.extend(["", "## Comparacion por periodos", ""])
+    lines.extend(_render_markdown_period_comparison(period_comparison))
 
     lines.extend(["", "## Calidad de datos", ""])
     lines.extend(_render_markdown_quality(data_quality))
@@ -104,6 +109,7 @@ def render_html_report(analysis: dict, approval: dict | None = None) -> str:
     profitability = metrics["profitability"]
     stock = metrics["stock"]
     concentration = metrics["concentration"]
+    period_comparison = analysis.get("period_comparison") or metrics.get("period_comparison") or {}
     data_quality = analysis.get("data_quality") or metrics.get("data_quality") or {}
     threshold_config = analysis.get("threshold_config") or {}
     alerts = analysis["alerts"]
@@ -122,6 +128,7 @@ def render_html_report(analysis: dict, approval: dict | None = None) -> str:
         ("Exceso stock", str(stock["productos_exceso"])),
         (f"Concentracion top {concentration['top_n']}", _percent(concentration["ratio"])),
         ("Unidades vendidas", str(sales["unidades_vendidas"])),
+        ("Comparaciones", _period_availability_label(period_comparison)),
         ("Calidad datos", _quality_label(data_quality)),
         ("Perfil umbrales", _threshold_profile_label(threshold_config)),
     ]
@@ -269,6 +276,10 @@ def render_html_report(analysis: dict, approval: dict | None = None) -> str:
       {_render_html_recommendations(recommendations)}
     </section>
     <section>
+      <h2>Comparacion por periodos</h2>
+      {_render_html_period_comparison(period_comparison)}
+    </section>
+    <section>
       <h2>Calidad de datos</h2>
       {_render_html_quality(data_quality)}
     </section>
@@ -328,6 +339,59 @@ def _threshold_profile_label(threshold_config: dict) -> str:
     if not threshold_config:
         return "default"
     return str(threshold_config.get("profile") or "default")
+
+
+def _period_availability_label(period_comparison: dict) -> str:
+    if not period_comparison:
+        return "sin_dato"
+    if not period_comparison.get("available"):
+        return "sin base comparable"
+    return f"{period_comparison.get('comparison_count', 0)} disponibles"
+
+
+def _render_markdown_period_comparison(period_comparison: dict) -> list[str]:
+    if not period_comparison:
+        return ["- Comparacion por periodos no calculada."]
+
+    comparisons = period_comparison.get("comparisons") or []
+    lines: list[str] = []
+    for comparison in comparisons:
+        if comparison.get("status") != "available":
+            lines.append(f"- **{comparison.get('label')}**: sin datos suficientes ({comparison.get('reason')}).")
+            continue
+        current = comparison["current_period"]
+        previous = comparison["previous_period"]
+        sales = comparison["metrics"]["ventas_totales"]
+        margin = comparison["metrics"]["margen_porcentaje"]
+        lines.extend(
+            [
+                f"- **{comparison['label']}**",
+                f"  - Periodo actual: {current.get('label')} ({current.get('start')} a {current.get('end')})",
+                f"  - Periodo previo: {previous.get('label')} ({previous.get('start')} a {previous.get('end')})",
+                f"  - Ventas: {_change_label(sales, money=True)}",
+                f"  - Margen porcentual: {_change_label(margin, percent_points=True)}",
+                f"  - Resumen: {comparison.get('summary')}",
+            ]
+        )
+
+    highlights = period_comparison.get("highlights") or []
+    if highlights:
+        lines.append("- Senales destacadas:")
+        for item in highlights[:4]:
+            lines.append(f"  - {item.get('type')}: {item.get('description')}")
+    return lines or ["- No hay comparaciones disponibles."]
+
+
+def _change_label(metric: dict, money: bool = False, percent_points: bool = False) -> str:
+    current = metric.get("current")
+    previous = metric.get("previous")
+    absolute = metric.get("absolute_change")
+    percent_change = metric.get("percent_change")
+    current_text = _money(current) if money else _percent(current) if percent_points else str(current)
+    previous_text = _money(previous) if money else _percent(previous) if percent_points else str(previous)
+    absolute_text = _money(absolute) if money else _percent(absolute) if percent_points else str(absolute)
+    pct_text = "sin base previa" if percent_change is None else _percent(percent_change)
+    return f"{current_text} vs {previous_text}; cambio {absolute_text} ({pct_text})"
 
 
 def _render_markdown_quality(data_quality: dict) -> list[str]:
@@ -404,6 +468,37 @@ def _render_html_recommendations(recommendations: list[dict]) -> str:
             """
         )
     return "".join(output)
+
+
+def _render_html_period_comparison(period_comparison: dict) -> str:
+    if not period_comparison:
+        return '<p class="note">Comparacion por periodos no calculada.</p>'
+    comparisons = period_comparison.get("comparisons") or []
+    output = []
+    for comparison in comparisons:
+        if comparison.get("status") != "available":
+            output.append(f'<p class="note">{_html(comparison.get("label"))}: sin datos suficientes. {_html(comparison.get("reason"))}</p>')
+            continue
+        sales = comparison["metrics"]["ventas_totales"]
+        margin = comparison["metrics"]["margen_porcentaje"]
+        current = comparison["current_period"]
+        previous = comparison["previous_period"]
+        output.append(
+            f"""
+            <article class="recommendation">
+              <h3>{_html(comparison["label"])}</h3>
+              <p class="note">Actual: {_html(current.get("label"))} ({_html(current.get("start"))} a {_html(current.get("end"))}) | Previo: {_html(previous.get("label"))} ({_html(previous.get("start"))} a {_html(previous.get("end"))})</p>
+              <p><strong>Ventas:</strong> {_html(_change_label(sales, money=True))}</p>
+              <p><strong>Margen porcentual:</strong> {_html(_change_label(margin, percent_points=True))}</p>
+              <p class="evidence">{_html(comparison.get("summary"))}</p>
+            </article>
+            """
+        )
+    highlights = period_comparison.get("highlights") or []
+    if highlights:
+        items = "".join(f"<li>{_html(item.get('type'))}: {_html(item.get('description'))}</li>" for item in highlights[:4])
+        output.append(f"<ul>{items}</ul>")
+    return "".join(output) if output else '<p class="note">No hay comparaciones disponibles.</p>'
 
 
 def _render_html_quality(data_quality: dict) -> str:

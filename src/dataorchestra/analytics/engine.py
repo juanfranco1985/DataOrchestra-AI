@@ -8,6 +8,7 @@ from typing import Any
 
 from dataorchestra.data_quality import assess_data_quality
 from dataorchestra.integrity import fingerprint_files
+from dataorchestra.periods import compare_sales_periods
 from dataorchestra.reporting import render_html_report, render_markdown_report
 from dataorchestra.runs import archive_file, new_run_id, run_stage_dir
 from dataorchestra.states import DiagnosticStatus
@@ -50,6 +51,7 @@ def run_client_analysis(client_dir: str | Path, thresholds: dict[str, float] | N
     concentration = _revenue_concentration(product_metrics, active_thresholds)
     low_margin = _low_margin_products(product_metrics, active_thresholds)
     data_quality = assess_data_quality(client_path)
+    period_comparison = compare_sales_periods(sales_rows)
 
     metrics = {
         "sales": sales_metrics,
@@ -63,6 +65,10 @@ def run_client_analysis(client_dir: str | Path, thresholds: dict[str, float] | N
         "top_products_by_revenue": product_metrics[:10],
         "sales_by_category": category_metrics,
         "sales_by_month": monthly_metrics,
+        "period_comparison": {
+            "available": period_comparison["available"],
+            "comparison_count": period_comparison["comparison_count"],
+        },
         "data_quality": {
             "score": data_quality["score"],
             "level": data_quality["level"],
@@ -79,6 +85,7 @@ def run_client_analysis(client_dir: str | Path, thresholds: dict[str, float] | N
     alerts_path = diagnostics_dir / "alerts.json"
     recommendations_path = diagnostics_dir / "recommendations.json"
     data_quality_path = diagnostics_dir / "data_quality.json"
+    period_comparison_path = diagnostics_dir / "period_comparison.json"
     threshold_config_path = diagnostics_dir / "threshold_config.json"
     analysis_summary_path = diagnostics_dir / "analysis_summary.json"
     archive_dir = run_stage_dir(client_path, run_id, "analysis")
@@ -92,6 +99,7 @@ def run_client_analysis(client_dir: str | Path, thresholds: dict[str, float] | N
         "can_continue": True,
         "metrics": metrics,
         "data_quality": data_quality,
+        "period_comparison": period_comparison,
         "threshold_config": threshold_config,
         "alerts": alerts,
         "recommendations": recommendations,
@@ -106,6 +114,7 @@ def run_client_analysis(client_dir: str | Path, thresholds: dict[str, float] | N
             "draft_markdown": str(draft_markdown_path),
             "draft_html": str(draft_html_path),
             "data_quality": str(data_quality_path),
+            "period_comparison": str(period_comparison_path),
             "threshold_config": str(threshold_config_path),
             "analysis_summary": str(analysis_summary_path),
             "archive_dir": str(archive_dir),
@@ -114,6 +123,7 @@ def run_client_analysis(client_dir: str | Path, thresholds: dict[str, float] | N
                 "alerts": str(archive_dir / alerts_path.name),
                 "recommendations": str(archive_dir / recommendations_path.name),
                 "data_quality": str(archive_dir / data_quality_path.name),
+                "period_comparison": str(archive_dir / period_comparison_path.name),
                 "threshold_config": str(archive_dir / threshold_config_path.name),
                 "analysis_summary": str(archive_dir / analysis_summary_path.name),
                 "draft_json": str(archive_dir / draft_json_path.name),
@@ -126,6 +136,7 @@ def run_client_analysis(client_dir: str | Path, thresholds: dict[str, float] | N
     _write_json(alerts_path, alerts)
     _write_json(recommendations_path, recommendations)
     _write_json(data_quality_path, data_quality)
+    _write_json(period_comparison_path, period_comparison)
     _write_json(threshold_config_path, threshold_config)
     _write_json(analysis_summary_path, result)
     _write_json(draft_json_path, result)
@@ -136,6 +147,7 @@ def run_client_analysis(client_dir: str | Path, thresholds: dict[str, float] | N
         alerts_path,
         recommendations_path,
         data_quality_path,
+        period_comparison_path,
         threshold_config_path,
         analysis_summary_path,
         draft_json_path,
