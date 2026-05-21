@@ -68,6 +68,7 @@ def test_analysis_generates_metrics_alerts_recommendations_and_draft(tmp_path: P
     assert all(alert["confidence"]["level"] in {"alta", "media", "baja"} for alert in result["alerts"])
     assert all(0 <= alert["confidence"]["score"] <= 100 for alert in result["alerts"])
     assert all("evidence_alert_ids" in recommendation for recommendation in result["recommendations"])
+    assert result["recommendation_tracking"]["summary"]["pending_review"] == len(result["recommendations"])
 
     draft_path = client_dir / "reports" / "diagnostico_borrador.json"
     assert json.loads(draft_path.read_text(encoding="utf-8")) == result
@@ -82,6 +83,7 @@ def test_analysis_generates_metrics_alerts_recommendations_and_draft(tmp_path: P
     assert Path(result["outputs"]["archived"]["data_quality"]).exists()
     assert Path(result["outputs"]["archived"]["period_comparison"]).exists()
     assert Path(result["outputs"]["archived"]["threshold_config"]).exists()
+    assert Path(result["outputs"]["archived"]["recommendation_tracking"]).exists()
     assert Path(result["outputs"]["archived"]["analysis_summary"]).exists()
     assert "**Estado:** pending_human_review" in markdown
     assert "## Comparacion por periodos" in markdown

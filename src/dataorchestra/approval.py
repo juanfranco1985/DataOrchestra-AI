@@ -5,7 +5,8 @@ from pathlib import Path
 from typing import Any
 
 from dataorchestra.audit import now_iso
-from dataorchestra.reporting import render_html_report
+from dataorchestra.recommendations import apply_tracking_to_analysis, load_recommendation_tracking
+from dataorchestra.reporting import render_html_report, render_markdown_report
 from dataorchestra.runs import archive_file, new_run_id, run_stage_dir
 from dataorchestra.states import DiagnosticStatus
 
@@ -27,6 +28,7 @@ def approve_for_delivery(client_dir: str | Path, reviewer: str, notes: str, conf
         return blocked
 
     analysis = json.loads(draft_json_path.read_text(encoding="utf-8"))
+    analysis = apply_tracking_to_analysis(analysis, load_recommendation_tracking(client_path))
     run_id = str(analysis.get("run_id") or new_run_id())
     archive_dir = run_stage_dir(client_path, run_id, "approval")
     approval = {
@@ -62,7 +64,7 @@ def approve_for_delivery(client_dir: str | Path, reviewer: str, notes: str, conf
             },
         },
     }
-    approved_markdown = _render_approved_markdown(draft_markdown_path.read_text(encoding="utf-8"), approval)
+    approved_markdown = _render_approved_markdown(render_markdown_report(approved_payload), approval)
     approved_html = render_html_report(approved_payload, approval=approval)
 
     _write_json(review_dir / "approval_record.json", approval)

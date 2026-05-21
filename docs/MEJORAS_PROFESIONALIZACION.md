@@ -134,5 +134,6 @@ Objetivo: poder vender pilotos con expectativa clara.
 - [x] Implementar validacion avanzada de consistencia comercial.
 - [x] Implementar comparacion por periodos.
 - [x] Implementar confianza operativa por hallazgo.
+- [x] Implementar seguimiento de recomendaciones.
 - [ ] Publicar web online.
 - [ ] Integrar backend, webhook o CRM.

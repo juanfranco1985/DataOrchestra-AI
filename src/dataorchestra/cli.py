@@ -17,6 +17,7 @@ from dataorchestra.integrity import fingerprint_files
 from dataorchestra.pdf import export_report_pdf
 from dataorchestra.privacy import scan_csv_files
 from dataorchestra.readiness import inspect_readiness
+from dataorchestra.recommendations import UPDATEABLE_RECOMMENDATION_STATUSES, load_recommendation_tracking, update_recommendation_status
 from dataorchestra.runs import archive_file, new_run_id, run_stage_dir
 from dataorchestra.runtime import close_pilot, default_runtime_dir, prepare_runtime
 from dataorchestra.states import DiagnosticStatus
@@ -162,6 +163,54 @@ def run_thresholds(client_dir: str | Path) -> dict:
         "client_dir": str(Path(client_dir)),
         **result,
     }
+
+
+def run_recommendations(client_dir: str | Path) -> dict:
+    tracking = load_recommendation_tracking(client_dir)
+    if not tracking:
+        return {
+            "status": "recommendation_tracking_missing",
+            "exists": False,
+            "reason": "Run analysis before inspecting recommendation tracking.",
+        }
+    return tracking
+
+
+def run_update_recommendation(
+    client_dir: str | Path,
+    recommendation_id: str,
+    status: str,
+    reviewer: str,
+    notes: str = "",
+    owner: str = "",
+    due_date: str = "",
+    confirm_no_sensitive_values: bool = False,
+) -> dict:
+    client_path = Path(client_dir)
+    result = update_recommendation_status(
+        client_path,
+        recommendation_id=recommendation_id,
+        status=status,
+        reviewer=reviewer,
+        notes=notes,
+        owner=owner,
+        due_date=due_date,
+        confirm_no_sensitive_values=confirm_no_sensitive_values,
+    )
+    if result.get("status") == "recommendation_updated":
+        append_audit_event(
+            client_path / "logs" / "audit.jsonl",
+            "recommendation_updated",
+            str(result.get("client_id") or _read_client_id(client_path)),
+            str(result.get("review_status")),
+            {
+                "recommendation_id": result.get("recommendation_id"),
+                "previous_status": result.get("previous_status"),
+                "reviewer": result.get("reviewer"),
+                "tracking_path": result.get("tracking_path"),
+            },
+        )
+    return result
 
 
 def run_data_contracts(dataset: str | None = None) -> dict:
@@ -348,6 +397,19 @@ def main() -> int:
     thresholds = sub.add_parser("thresholds", help="Show the active analytics thresholds for a client")
     thresholds.add_argument("--client-dir", required=True)
 
+    recommendations = sub.add_parser("recommendations", help="Show recommendation tracking for a client")
+    recommendations.add_argument("--client-dir", required=True)
+
+    update_recommendation = sub.add_parser("update-recommendation", help="Update the human review status of one recommendation")
+    update_recommendation.add_argument("--client-dir", required=True)
+    update_recommendation.add_argument("--recommendation-id", required=True)
+    update_recommendation.add_argument("--status", choices=sorted(UPDATEABLE_RECOMMENDATION_STATUSES), required=True)
+    update_recommendation.add_argument("--reviewer", required=True)
+    update_recommendation.add_argument("--notes", default="")
+    update_recommendation.add_argument("--owner", default="")
+    update_recommendation.add_argument("--due-date", default="")
+    update_recommendation.add_argument("--confirm-no-sensitive-values", action="store_true")
+
     data_contracts = sub.add_parser("data-contracts", help="Show versioned CSV data contracts")
     data_contracts.add_argument("--dataset", choices=sorted(DATA_CONTRACTS))
 
@@ -430,6 +492,23 @@ def main() -> int:
         result = run_thresholds(args.client_dir)
         print(json.dumps(result, indent=2, ensure_ascii=False))
         return 0
+    if args.command == "recommendations":
+        result = run_recommendations(args.client_dir)
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        return 0 if result.get("exists", True) else 2
+    if args.command == "update-recommendation":
+        result = run_update_recommendation(
+            args.client_dir,
+            recommendation_id=args.recommendation_id,
+            status=args.status,
+            reviewer=args.reviewer,
+            notes=args.notes,
+            owner=args.owner,
+            due_date=args.due_date,
+            confirm_no_sensitive_values=args.confirm_no_sensitive_values,
+        )
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        return 0 if result["status"] == "recommendation_updated" else 2
     if args.command == "data-contracts":
         result = run_data_contracts(args.dataset)
         print(json.dumps(result, indent=2, ensure_ascii=False))

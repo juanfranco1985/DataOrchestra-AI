@@ -20,6 +20,7 @@ CRITICAL_DOCS = (
     "docs/VALIDACION_AVANZADA_DATOS.md",
     "docs/COMPARACION_PERIODOS.md",
     "docs/CONFIANZA_HALLAZGOS.md",
+    "docs/SEGUIMIENTO_RECOMENDACIONES.md",
 )
 
 
@@ -48,6 +49,7 @@ def inspect_readiness(client_dir: str | Path, repo_root: str | Path | None = Non
         checks.extend(_raw_file_checks(status))
         checks.extend(_preflight_checks(status))
         checks.extend(_data_quality_checks(status))
+        checks.extend(_recommendation_checks(status))
         checks.extend(_review_gate_checks(status))
         checks.extend(_incident_checks(status))
         checks.extend(_closure_checks(status))
@@ -236,6 +238,45 @@ def _data_quality_checks(status: dict[str, Any]) -> list[ReadinessCheck]:
             "data_quality",
             "El score de calidad permite interpretar el diagnostico.",
             {"score": data_quality.get("score"), "target_score": data_quality.get("target_score"), "level": data_quality.get("level")},
+        )
+    ]
+
+
+def _recommendation_checks(status: dict[str, Any]) -> list[ReadinessCheck]:
+    analysis = status.get("analysis", {})
+    recommendations = status.get("recommendations", {})
+    if not analysis.get("exists"):
+        return []
+    if not recommendations.get("exists"):
+        return [
+            _warn(
+                "recommendation_tracking_missing",
+                "recommendations",
+                "Falta seguimiento de recomendaciones para el analisis generado.",
+                {},
+            )
+        ]
+
+    if recommendations.get("pending_review", 0) > 0:
+        return [
+            _warn(
+                "recommendations_pending_review",
+                "recommendations",
+                "Hay recomendaciones pendientes de revision humana.",
+                {
+                    "pending_review": recommendations.get("pending_review"),
+                    "reviewed": recommendations.get("reviewed"),
+                    "active": recommendations.get("active"),
+                },
+            )
+        ]
+
+    return [
+        _pass(
+            "recommendations_reviewed",
+            "recommendations",
+            "Las recomendaciones activas tienen seguimiento registrado.",
+            {"reviewed": recommendations.get("reviewed"), "active": recommendations.get("active")},
         )
     ]
 

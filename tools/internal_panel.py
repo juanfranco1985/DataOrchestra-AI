@@ -20,7 +20,9 @@ from dataorchestra.cli import (
     run_init_client,
     run_prepare_runtime,
     run_preflight,
+    run_recommendations,
     run_status,
+    run_update_recommendation,
 )
 from dataorchestra.panel_support import client_label, list_client_dirs, raw_file_table, read_text_preview
 
@@ -149,6 +151,42 @@ def render_operations(client_dir: Path) -> None:
         st.json(run_analysis(client_dir))
     if c3.button("Full-run", use_container_width=True):
         st.json(run_full_run(client_dir))
+
+    st.divider()
+    st.subheader("Seguimiento de recomendaciones")
+    tracking = run_recommendations(client_dir)
+    if tracking.get("status") == "recommendations_tracked":
+        recommendations = [item for item in tracking.get("recommendations", []) if item.get("active") is not False]
+        st.json(tracking.get("summary", {}))
+        if recommendations:
+            selected = st.selectbox(
+                "Recomendacion",
+                recommendations,
+                format_func=lambda item: f"{item['id']} - {item.get('title', '')}",
+            )
+            rec_status = st.selectbox("Estado", ["pending_review", "accepted", "rejected", "needs_client_context", "converted_to_action", "completed"])
+            rec_reviewer = st.text_input("Revisor de recomendacion")
+            rec_owner = st.text_input("Responsable sugerido")
+            rec_due_date = st.text_input("Fecha objetivo", placeholder="2026-06-01")
+            rec_notes = st.text_area("Notas de recomendacion")
+            rec_confirm = st.checkbox("Confirmo que el seguimiento no contiene datos sensibles.")
+            if st.button("Actualizar recomendacion", disabled=not rec_reviewer.strip() or not rec_confirm):
+                st.json(
+                    run_update_recommendation(
+                        client_dir,
+                        recommendation_id=selected["id"],
+                        status=rec_status,
+                        reviewer=rec_reviewer,
+                        notes=rec_notes,
+                        owner=rec_owner,
+                        due_date=rec_due_date,
+                        confirm_no_sensitive_values=rec_confirm,
+                    )
+                )
+        else:
+            st.info("No hay recomendaciones activas en el analisis vigente.")
+    else:
+        st.info("Ejecuta analisis para crear seguimiento de recomendaciones.")
 
     st.divider()
     st.subheader("Aprobacion humana")

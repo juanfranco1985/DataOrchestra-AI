@@ -29,6 +29,8 @@ def test_full_run_generates_pending_human_review_and_status_tracks_next_action(t
     assert status["current_stage"] == "pending_human_review"
     assert status["analysis"]["exists"] is True
     assert status["approval"]["exists"] is False
+    assert status["recommendations"]["exists"] is True
+    assert status["recommendations"]["pending_review"] == status["recommendations"]["active"]
     assert "aprobar" in status["next_action"].lower()
 
 

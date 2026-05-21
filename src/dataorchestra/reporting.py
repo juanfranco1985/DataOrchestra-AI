@@ -61,6 +61,7 @@ def render_markdown_report(analysis: dict) -> str:
     lines.extend(["", "## Recomendaciones", ""])
     for recommendation in recommendations:
         evidence_ids = ", ".join(recommendation.get("evidence_alert_ids") or ["sin_alerta_especifica"])
+        tracking_lines = _render_markdown_recommendation_tracking(recommendation)
         lines.extend(
             [
                 f"- **{recommendation['priority']} | {recommendation['title']}**",
@@ -68,6 +69,7 @@ def render_markdown_report(analysis: dict) -> str:
                 f"  - Evidencia asociada: {evidence_ids}",
             ]
         )
+        lines.extend(tracking_lines)
 
     lines.extend(["", "## Comparacion por periodos", ""])
     lines.extend(_render_markdown_period_comparison(period_comparison))
@@ -352,6 +354,18 @@ def _render_markdown_confidence(confidence: dict | None) -> list[str]:
     return lines
 
 
+def _render_markdown_recommendation_tracking(recommendation: dict) -> list[str]:
+    status = recommendation.get("review_status")
+    if not status:
+        return []
+    lines = [f"  - Seguimiento: {status}"]
+    if recommendation.get("owner"):
+        lines.append(f"  - Responsable sugerido: {recommendation.get('owner')}")
+    if recommendation.get("due_date"):
+        lines.append(f"  - Fecha objetivo: {recommendation.get('due_date')}")
+    return lines
+
+
 def _quality_label(data_quality: dict) -> str:
     if not data_quality:
         return "sin_dato"
@@ -503,16 +517,31 @@ def _render_html_recommendations(recommendations: list[dict]) -> str:
     output = []
     for recommendation in recommendations:
         evidence_ids = ", ".join(recommendation.get("evidence_alert_ids") or ["sin_alerta_especifica"])
+        tracking = _render_html_recommendation_tracking(recommendation)
         output.append(
             f"""
             <article class="recommendation">
               <h3><span class="priority">{_html(recommendation["priority"])}</span> | {_html(recommendation["title"])}</h3>
               <p>{_html(recommendation["detail"])}</p>
               <p class="evidence">Evidencia asociada: {_html(evidence_ids)}</p>
+              {tracking}
             </article>
             """
         )
     return "".join(output)
+
+
+def _render_html_recommendation_tracking(recommendation: dict) -> str:
+    status = recommendation.get("review_status")
+    if not status:
+        return ""
+    details = []
+    if recommendation.get("owner"):
+        details.append(f"Responsable: {_html(recommendation.get('owner'))}")
+    if recommendation.get("due_date"):
+        details.append(f"Fecha objetivo: {_html(recommendation.get('due_date'))}")
+    detail = f" | {' | '.join(details)}" if details else ""
+    return f'<p class="evidence">Seguimiento: {_html(status)}{detail}</p>'
 
 
 def _render_html_period_comparison(period_comparison: dict) -> str:

@@ -24,6 +24,7 @@ v2_0_primer_piloto_real_controlado/
     integrity.py            Fingerprints SHA-256 de archivos raw
     periods.py              Comparacion de ventas y margen por periodos
     readiness.py            Checklist tecnico-operativo automatizado
+    recommendations.py      Seguimiento auditable de recomendaciones
     privacy.py              Escaneo de columnas y valores sensibles
     reporting.py            Render de borrador ejecutivo Markdown
     status.py               Estado operativo y proxima accion
@@ -94,6 +95,7 @@ dataorchestra approve --client-dir clients/cliente_001 --reviewer "Nombre respon
 - Score de calidad de datos con observaciones trazables.
 - Umbrales analiticos por rubro y overrides por cliente.
 - Recomendaciones asociadas a alertas/evidencia.
+- Seguimiento de recomendaciones con estados, revisor, responsable y auditoria.
 - Borrador tecnico JSON y borrador ejecutivo Markdown.
 - Borrador ejecutivo HTML preparado para imprimir o guardar como PDF.
 - Estado `pending_human_review` por defecto.
@@ -136,6 +138,7 @@ Analisis:
 - `diagnostics/analysis/metrics_summary.json`
 - `diagnostics/analysis/alerts.json`
 - `diagnostics/analysis/recommendations.json`
+- `diagnostics/recommendations/recommendation_tracking.json`
 - `diagnostics/analysis/data_quality.json`
 - `diagnostics/analysis/period_comparison.json`
 - `diagnostics/analysis/threshold_config.json`
@@ -170,6 +173,13 @@ Confianza por hallazgo:
 - visible en `reports/diagnostico_borrador.md`
 - visible en `reports/diagnostico_borrador.html`
 
+Seguimiento de recomendaciones:
+
+- `diagnostics/recommendations/recommendation_tracking.json`
+- copias historicas en `runs/<run_id>/analysis/recommendation_tracking.json`
+- actualizaciones en `runs/<run_id>/recommendations/recommendation_tracking.json`
+- eventos `recommendation_updated` en `logs/audit.jsonl`
+
 Calidad de datos:
 
 - `diagnostics/data_quality/data_quality_report.json`
@@ -181,13 +191,14 @@ Calidad de datos:
 Ultima verificacion realizada:
 
 ```text
-python -m pytest -q            -> 64 passed
+python -m pytest -q            -> 68 passed
 python -m compileall src tests -> OK
-CLI disponible                -> init-client, prepare-runtime, status, readiness, data-contracts, thresholds, data-quality, preflight, analyze, full-run, approve, export-pdf, incident, resolve-incident, close-pilot
+CLI disponible                -> init-client, prepare-runtime, status, readiness, data-contracts, thresholds, data-quality, preflight, analyze, recommendations, update-recommendation, full-run, approve, export-pdf, incident, resolve-incident, close-pilot
 Readiness tecnico             -> checks de workspace, raw, preflight, docs, revision, incidentes y runtime
 Validacion avanzada           -> fechas fuera de rango, catalogo, margen, duplicados, stock, categorias y nombres similares
 Comparacion por periodos      -> ultimo mes observado y ventana movil de 30 dias
 Confianza por hallazgo        -> score, nivel, motivos y limitaciones por alerta
+Seguimiento recomendaciones   -> pending_review, accepted, rejected, needs_client_context, converted_to_action, completed
 Web Next.js                   -> npm run build OK, export estatico preparado
 Web GitHub Pages              -> build OK con basePath /DataOrchestra-AI
 Web FAQ comercial             -> ruta /faq incluida en export estatico

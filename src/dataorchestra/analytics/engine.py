@@ -10,6 +10,7 @@ from dataorchestra.confidence import apply_alert_confidence
 from dataorchestra.data_quality import assess_data_quality
 from dataorchestra.integrity import fingerprint_files
 from dataorchestra.periods import compare_sales_periods
+from dataorchestra.recommendations import apply_tracking_to_recommendations, sync_recommendation_tracking
 from dataorchestra.reporting import render_html_report, render_markdown_report
 from dataorchestra.runs import archive_file, new_run_id, run_stage_dir
 from dataorchestra.states import DiagnosticStatus
@@ -79,6 +80,8 @@ def run_client_analysis(client_dir: str | Path, thresholds: dict[str, float] | N
     alerts = _build_alerts(concentration, low_margin, low_stock, excess_stock, active_thresholds)
     alerts = apply_alert_confidence(alerts, sales_rows, products, stock_rows, data_quality)
     recommendations = _build_recommendations(alerts)
+    recommendation_tracking = sync_recommendation_tracking(client_path, recommendations, run_id, gate["client_id"])
+    recommendations = apply_tracking_to_recommendations(recommendations, recommendation_tracking)
     raw_fingerprints = fingerprint_files(raw_dir.glob("*.csv"))
     draft_json_path = reports_dir / "diagnostico_borrador.json"
     draft_markdown_path = reports_dir / "diagnostico_borrador.md"
@@ -103,6 +106,11 @@ def run_client_analysis(client_dir: str | Path, thresholds: dict[str, float] | N
         "data_quality": data_quality,
         "period_comparison": period_comparison,
         "threshold_config": threshold_config,
+        "recommendation_tracking": {
+            "status": recommendation_tracking["status"],
+            "summary": recommendation_tracking["summary"],
+            "tracking_path": recommendation_tracking["outputs"]["current_tracking"],
+        },
         "alerts": alerts,
         "recommendations": recommendations,
         "evidence": {
@@ -118,6 +126,7 @@ def run_client_analysis(client_dir: str | Path, thresholds: dict[str, float] | N
             "data_quality": str(data_quality_path),
             "period_comparison": str(period_comparison_path),
             "threshold_config": str(threshold_config_path),
+            "recommendation_tracking": recommendation_tracking["outputs"]["current_tracking"],
             "analysis_summary": str(analysis_summary_path),
             "archive_dir": str(archive_dir),
             "archived": {
@@ -127,6 +136,7 @@ def run_client_analysis(client_dir: str | Path, thresholds: dict[str, float] | N
                 "data_quality": str(archive_dir / data_quality_path.name),
                 "period_comparison": str(archive_dir / period_comparison_path.name),
                 "threshold_config": str(archive_dir / threshold_config_path.name),
+                "recommendation_tracking": recommendation_tracking["outputs"]["archived_tracking"],
                 "analysis_summary": str(archive_dir / analysis_summary_path.name),
                 "draft_json": str(archive_dir / draft_json_path.name),
                 "draft_markdown": str(archive_dir / draft_markdown_path.name),

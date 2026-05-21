@@ -7,6 +7,7 @@ from typing import Any
 import yaml
 
 from dataorchestra.incidents import summarize_incidents
+from dataorchestra.recommendations import summarize_recommendations
 from dataorchestra.states import DiagnosticStatus
 
 
@@ -25,6 +26,7 @@ def inspect_client_status(client_dir: str | Path) -> dict[str, Any]:
     raw_files = _raw_files_status(raw_dir)
     current_stage = _current_stage(raw_files, preflight, analysis, approval, closure, config)
     incidents = summarize_incidents(client_path)
+    recommendations = summarize_recommendations(client_path)
 
     return {
         "client_id": _client_id(client_path, config),
@@ -37,6 +39,7 @@ def inspect_client_status(client_dir: str | Path) -> dict[str, Any]:
         "approval": _approval_status(approval),
         "closure": _closure_status(closure),
         "data_quality": _data_quality_status(data_quality),
+        "recommendations": recommendations,
         "incidents": incidents,
         "last_audit_event": _last_audit_event(client_path / "logs" / "audit.jsonl"),
     }

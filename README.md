@@ -41,6 +41,8 @@ dataorchestra thresholds --client-dir clients/cliente_001
 dataorchestra preflight --client-dir clients/cliente_001
 dataorchestra data-quality --client-dir clients/cliente_001
 dataorchestra analyze --client-dir clients/cliente_001
+dataorchestra recommendations --client-dir clients/cliente_001
+dataorchestra update-recommendation --client-dir clients/cliente_001 --recommendation-id rec_bajo_margen --status accepted --reviewer "Nombre responsable" --notes "Validada para devolucion controlada" --confirm-no-sensitive-values
 dataorchestra full-run --client-dir clients/cliente_001
 dataorchestra approve --client-dir clients/cliente_001 --reviewer "Nombre responsable" --notes "Revision humana completada" --confirm-human-review
 dataorchestra export-pdf --client-dir clients/cliente_001
@@ -64,6 +66,8 @@ python -m dataorchestra.cli thresholds --client-dir clients/cliente_001
 python -m dataorchestra.cli preflight --client-dir clients/cliente_001
 python -m dataorchestra.cli data-quality --client-dir clients/cliente_001
 python -m dataorchestra.cli analyze --client-dir clients/cliente_001
+python -m dataorchestra.cli recommendations --client-dir clients/cliente_001
+python -m dataorchestra.cli update-recommendation --client-dir clients/cliente_001 --recommendation-id rec_bajo_margen --status accepted --reviewer "Nombre responsable" --notes "Validada para devolucion controlada" --confirm-no-sensitive-values
 python -m dataorchestra.cli full-run --client-dir clients/cliente_001
 python -m dataorchestra.cli approve --client-dir clients/cliente_001 --reviewer "Nombre responsable" --notes "Revision humana completada" --confirm-human-review
 python -m dataorchestra.cli export-pdf --client-dir clients/cliente_001
@@ -98,6 +102,8 @@ El analisis incluye comparacion por periodos: ultimo mes observado vs mes anteri
 
 Cada alerta incorpora un score de confianza operativa con motivos y limitaciones para ayudar a la revision humana. Ver `docs/CONFIANZA_HALLAZGOS.md`.
 
+Cada recomendacion genera seguimiento operativo en `diagnostics/recommendations/recommendation_tracking.json`. Se puede revisar con `recommendations` y actualizar con `update-recommendation`. Ver `docs/SEGUIMIENTO_RECOMENDACIONES.md`.
+
 El comando `full-run` ejecuta `preflight` y, solo si esta listo, ejecuta `analyze`. No aprueba ni entrega informes; la aprobacion humana sigue siendo separada y obligatoria.
 
 Para datos reales, usar un runtime externo al repositorio. Ver `docs/RUNTIME_SEGURO_DATOS_REALES.md` y `docs/POLITICA_DATOS_REALES.md`.
@@ -110,6 +116,7 @@ El analisis solo corre si el preflight quedo en `ready_for_analysis` y si los fi
 
 - `reports/diagnostico_borrador.json`
 - `reports/diagnostico_borrador.md`
+- `diagnostics/recommendations/recommendation_tracking.json`
 
 El borrador Markdown es interno, incluye evidencia y conserva `report_status: pending_human_review`. No habilita entrega automatica.
 
@@ -208,6 +215,7 @@ Para preparar la conversacion comercial y la admision, usar:
 - `docs/VALIDACION_AVANZADA_DATOS.md`
 - `docs/COMPARACION_PERIODOS.md`
 - `docs/CONFIANZA_HALLAZGOS.md`
+- `docs/SEGUIMIENTO_RECOMENDACIONES.md`
 - `docs/READINESS_TECNICO_PILOTO.md`
 - `docs/CALIDAD_DATOS_Y_UMBRALES.md`
 - `docs/INCIDENTES_OPERATIVOS.md`
