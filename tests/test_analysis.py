@@ -52,6 +52,10 @@ def test_analysis_generates_metrics_alerts_recommendations_and_draft(tmp_path: P
     assert result["metrics"]["stock"]["valor_stock_total"] == 8100
     assert result["metrics"]["stock"]["productos_stock_bajo"] == 1
     assert result["metrics"]["stock"]["productos_exceso"] == 1
+    assert result["data_quality"]["score"] >= 70
+    assert result["metrics"]["data_quality"]["level"] == result["data_quality"]["level"]
+    assert result["threshold_config"]["profile"] == "default"
+    assert result["evidence"]["threshold_profile"] == "default"
     assert {alert["type"] for alert in result["alerts"]} == {
         "Bajo margen",
         "Concentracion",
@@ -71,8 +75,12 @@ def test_analysis_generates_metrics_alerts_recommendations_and_draft(tmp_path: P
     assert "Diagnostico ejecutivo borrador" in html_path.read_text(encoding="utf-8")
     assert Path(result["outputs"]["archived"]["draft_markdown"]).exists()
     assert Path(result["outputs"]["archived"]["draft_html"]).exists()
+    assert Path(result["outputs"]["archived"]["data_quality"]).exists()
+    assert Path(result["outputs"]["archived"]["threshold_config"]).exists()
     assert Path(result["outputs"]["archived"]["analysis_summary"]).exists()
     assert "**Estado:** pending_human_review" in markdown
+    assert "## Calidad de datos" in markdown
+    assert "## Umbrales aplicados" in markdown
     assert "no entregar al cliente sin revision humana" in markdown
     assert "## Alertas" in markdown
     assert "## Recomendaciones" in markdown
@@ -94,3 +102,25 @@ def test_analysis_blocks_if_raw_files_changed_after_preflight(tmp_path: Path):
     assert result["status"] == "raw_files_changed_after_preflight"
     assert result["can_continue"] is False
     assert (client_dir / "diagnostics" / "analysis" / "analysis_blocked.json").exists()
+
+
+def test_analysis_applies_threshold_profile_and_client_overrides(tmp_path: Path):
+    client_dir = tmp_path / "cliente_analysis"
+    write_analysis_client(client_dir)
+    (client_dir / "client.yaml").write_text(
+        "client:\n"
+        "  id: cliente_analysis\n"
+        "  business_type: Distribucion\n"
+        "analytics:\n"
+        "  thresholds:\n"
+        "    low_margin: 0.06\n",
+        encoding="utf-8",
+    )
+    assert run_preflight(client_dir)["status"] == "ready_for_analysis"
+
+    result = run_analysis(client_dir)
+
+    assert result["threshold_config"]["profile"] == "distribucion"
+    assert result["threshold_config"]["thresholds"]["low_margin"] == 0.06
+    assert "profile:distribucion" in result["threshold_config"]["sources"]
+    assert "client_config" in result["threshold_config"]["sources"]

@@ -56,6 +56,13 @@ def create_client_workspace(
             "report_status": DiagnosticStatus.PENDING_HUMAN_REVIEW.value,
             "delivery_allowed": False,
         },
+        "analytics": {
+            "threshold_profile": "auto",
+            "thresholds": {},
+        },
+        "data_quality": {
+            "target_score": 70,
+        },
     }
     config_path = client_path / "client.yaml"
     config_path.write_text(yaml.safe_dump(config, allow_unicode=True, sort_keys=False), encoding="utf-8")

@@ -10,6 +10,7 @@ from dataorchestra.analytics import run_client_analysis
 from dataorchestra.approval import approve_for_delivery
 from dataorchestra.audit import append_audit_event
 from dataorchestra.clients import create_client_workspace
+from dataorchestra.data_quality import assess_data_quality
 from dataorchestra.incidents import INCIDENT_TYPES, SEVERITIES, register_incident, resolve_incident
 from dataorchestra.integrity import fingerprint_files
 from dataorchestra.pdf import export_report_pdf
@@ -19,6 +20,7 @@ from dataorchestra.runs import archive_file, new_run_id, run_stage_dir
 from dataorchestra.runtime import close_pilot, default_runtime_dir, prepare_runtime
 from dataorchestra.states import DiagnosticStatus
 from dataorchestra.status import inspect_client_status
+from dataorchestra.thresholds import resolve_thresholds
 from dataorchestra.validation import validate_client_raw
 
 
@@ -121,6 +123,40 @@ def run_status(client_dir: str | Path) -> dict:
 
 def run_readiness(client_dir: str | Path, repo_root: str | Path | None = ".") -> dict:
     return inspect_readiness(client_dir, repo_root=repo_root)
+
+
+def run_data_quality(client_dir: str | Path) -> dict:
+    client_path = Path(client_dir)
+    run_id = new_run_id()
+    result = assess_data_quality(client_path)
+    result["run_id"] = run_id
+    result["status"] = "data_quality_assessed"
+    report_path = client_path / "diagnostics" / "data_quality" / "data_quality_report.json"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    archived_report = str(run_stage_dir(client_path, run_id, "data_quality") / report_path.name)
+    result["outputs"] = {
+        "current_report": str(report_path),
+        "archived_report": archived_report,
+    }
+    report_path.write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8")
+    archive_file(client_path, run_id, "data_quality", report_path)
+    append_audit_event(
+        client_path / "logs" / "audit.jsonl",
+        "data_quality",
+        _read_client_id(client_path),
+        str(result.get("level")),
+        {"run_id": run_id, "score": result.get("score"), "can_support_diagnostic": bool(result.get("can_support_diagnostic"))},
+    )
+    return result
+
+
+def run_thresholds(client_dir: str | Path) -> dict:
+    result = resolve_thresholds(client_dir)
+    return {
+        "status": "thresholds_resolved",
+        "client_dir": str(Path(client_dir)),
+        **result,
+    }
 
 
 def run_full_run(client_dir: str | Path) -> dict:
@@ -294,6 +330,12 @@ def main() -> int:
     readiness.add_argument("--client-dir", required=True)
     readiness.add_argument("--repo-root", default=".")
 
+    data_quality = sub.add_parser("data-quality", help="Assess raw data quality before interpreting a diagnosis")
+    data_quality.add_argument("--client-dir", required=True)
+
+    thresholds = sub.add_parser("thresholds", help="Show the active analytics thresholds for a client")
+    thresholds.add_argument("--client-dir", required=True)
+
     full_run = sub.add_parser("full-run", help="Run preflight and analysis without approval")
     full_run.add_argument("--client-dir", required=True)
 
@@ -365,6 +407,14 @@ def main() -> int:
         result = run_readiness(args.client_dir, repo_root=args.repo_root)
         print(json.dumps(result, indent=2, ensure_ascii=False))
         return 0 if result["can_continue"] else 2
+    if args.command == "data-quality":
+        result = run_data_quality(args.client_dir)
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        return 0 if result["can_support_diagnostic"] else 2
+    if args.command == "thresholds":
+        result = run_thresholds(args.client_dir)
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        return 0
     if args.command == "full-run":
         result = run_full_run(args.client_dir)
         print(json.dumps(result, indent=2, ensure_ascii=False))

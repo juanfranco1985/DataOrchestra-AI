@@ -20,6 +20,7 @@ def inspect_client_status(client_dir: str | Path) -> dict[str, Any]:
     analysis = _read_json(client_path / "reports" / "diagnostico_borrador.json")
     approval = _read_json(client_path / "diagnostics" / "review" / "approval_record.json")
     closure = _read_json(client_path / "diagnostics" / "closure" / "closure_record.json")
+    data_quality = _read_json(client_path / "diagnostics" / "analysis" / "data_quality.json") or _read_json(client_path / "diagnostics" / "data_quality" / "data_quality_report.json")
     config = _read_yaml(client_path / "client.yaml")
     raw_files = _raw_files_status(raw_dir)
     current_stage = _current_stage(raw_files, preflight, analysis, approval, closure, config)
@@ -35,6 +36,7 @@ def inspect_client_status(client_dir: str | Path) -> dict[str, Any]:
         "analysis": _analysis_status(analysis),
         "approval": _approval_status(approval),
         "closure": _closure_status(closure),
+        "data_quality": _data_quality_status(data_quality),
         "incidents": incidents,
         "last_audit_event": _last_audit_event(client_path / "logs" / "audit.jsonl"),
     }
@@ -142,6 +144,20 @@ def _closure_status(closure: dict | None) -> dict[str, Any]:
         "reviewer": closure.get("reviewer"),
         "closed_at": closure.get("closed_at"),
         "data_retention_action_required": closure.get("data_retention_action_required"),
+    }
+
+
+def _data_quality_status(data_quality: dict | None) -> dict[str, Any]:
+    if not data_quality:
+        return {"exists": False}
+    return {
+        "exists": True,
+        "status": data_quality.get("status") or "data_quality_assessed",
+        "score": data_quality.get("score"),
+        "level": data_quality.get("level"),
+        "target_score": data_quality.get("target_score"),
+        "can_support_diagnostic": data_quality.get("can_support_diagnostic"),
+        "finding_count": len(data_quality.get("findings") or []),
     }
 
 

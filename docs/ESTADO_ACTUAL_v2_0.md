@@ -17,12 +17,14 @@ v2_0_primer_piloto_real_controlado/
     approval.py             Aprobacion humana auditable
     audit.py                Eventos JSONL de auditoria
     cli.py                  Comandos operativos del piloto controlado
+    data_quality.py         Score de calidad de datos
     incidents.py            Registro y resolucion auditable de incidentes
     integrity.py            Fingerprints SHA-256 de archivos raw
     readiness.py            Checklist tecnico-operativo automatizado
     privacy.py              Escaneo de columnas y valores sensibles
     reporting.py            Render de borrador ejecutivo Markdown
     status.py               Estado operativo y proxima accion
+    thresholds.py           Umbrales analiticos por rubro
     clients.py              Creacion de espacios operativos por cliente
     runs.py                 Historial de artefactos por run_id
     states.py               Estados permitidos del diagnostico
@@ -81,6 +83,8 @@ dataorchestra approve --client-dir clients/cliente_001 --reviewer "Nombre respon
 - Bloqueo del analisis si los CSV cambian despues del preflight aprobado.
 - Motor analitico basico para ventas, costos, margen, ticket promedio, stock, concentracion, top productos, ventas por categoria y ventas por mes.
 - Alertas de bajo margen, stock bajo, exceso de stock y concentracion de facturacion.
+- Score de calidad de datos con observaciones trazables.
+- Umbrales analiticos por rubro y overrides por cliente.
 - Recomendaciones asociadas a alertas/evidencia.
 - Borrador tecnico JSON y borrador ejecutivo Markdown.
 - Borrador ejecutivo HTML preparado para imprimir o guardar como PDF.
@@ -122,6 +126,8 @@ Analisis:
 - `diagnostics/analysis/metrics_summary.json`
 - `diagnostics/analysis/alerts.json`
 - `diagnostics/analysis/recommendations.json`
+- `diagnostics/analysis/data_quality.json`
+- `diagnostics/analysis/threshold_config.json`
 - `diagnostics/analysis/analysis_summary.json`
 - `reports/diagnostico_borrador.json`
 - `reports/diagnostico_borrador.md`
@@ -146,14 +152,20 @@ Incidentes:
 - `diagnostics/incidents/incidents_index.json`
 - eventos `incident_registered` e `incident_resolved` en `logs/audit.jsonl`
 
+Calidad de datos:
+
+- `diagnostics/data_quality/data_quality_report.json`
+- `runs/<run_id>/data_quality/data_quality_report.json`
+- evento `data_quality` en `logs/audit.jsonl`
+
 ## Validaciones tecnicas ejecutadas
 
 Ultima verificacion realizada:
 
 ```text
-python -m pytest -q            -> 43 passed
+python -m pytest -q            -> 53 passed
 python -m compileall src tests -> OK
-CLI disponible                -> init-client, prepare-runtime, status, readiness, preflight, analyze, full-run, approve, export-pdf, incident, resolve-incident, close-pilot
+CLI disponible                -> init-client, prepare-runtime, status, readiness, thresholds, data-quality, preflight, analyze, full-run, approve, export-pdf, incident, resolve-incident, close-pilot
 Readiness tecnico             -> checks de workspace, raw, preflight, docs, revision, incidentes y runtime
 Web Next.js                   -> npm run build OK, export estatico preparado
 Web GitHub Pages              -> build OK con basePath /DataOrchestra-AI

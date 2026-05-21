@@ -6,20 +6,13 @@ import json
 from pathlib import Path
 from typing import Any
 
+from dataorchestra.data_quality import assess_data_quality
 from dataorchestra.integrity import fingerprint_files
 from dataorchestra.reporting import render_html_report, render_markdown_report
 from dataorchestra.runs import archive_file, new_run_id, run_stage_dir
 from dataorchestra.states import DiagnosticStatus
+from dataorchestra.thresholds import resolve_thresholds
 from dataorchestra.validation import normalize_name
-
-
-DEFAULT_THRESHOLDS = {
-    "low_margin": 0.20,
-    "critical_margin": 0.15,
-    "excess_stock_ratio": 3.0,
-    "revenue_concentration_top_n": 5,
-    "revenue_concentration_warning": 0.50,
-}
 
 
 def run_client_analysis(client_dir: str | Path, thresholds: dict[str, float] | None = None) -> dict:
@@ -30,7 +23,8 @@ def run_client_analysis(client_dir: str | Path, thresholds: dict[str, float] | N
     diagnostics_dir.mkdir(parents=True, exist_ok=True)
     reports_dir.mkdir(parents=True, exist_ok=True)
 
-    active_thresholds = {**DEFAULT_THRESHOLDS, **(thresholds or {})}
+    threshold_config = resolve_thresholds(client_path, runtime_overrides=thresholds)
+    active_thresholds = threshold_config["thresholds"]
     gate = _check_preflight_gate(client_path)
     if not gate["can_continue"]:
         result = {
@@ -55,6 +49,7 @@ def run_client_analysis(client_dir: str | Path, thresholds: dict[str, float] | N
     stock_metrics, low_stock, excess_stock = _stock_metrics(stock_rows, active_thresholds)
     concentration = _revenue_concentration(product_metrics, active_thresholds)
     low_margin = _low_margin_products(product_metrics, active_thresholds)
+    data_quality = assess_data_quality(client_path)
 
     metrics = {
         "sales": sales_metrics,
@@ -68,6 +63,11 @@ def run_client_analysis(client_dir: str | Path, thresholds: dict[str, float] | N
         "top_products_by_revenue": product_metrics[:10],
         "sales_by_category": category_metrics,
         "sales_by_month": monthly_metrics,
+        "data_quality": {
+            "score": data_quality["score"],
+            "level": data_quality["level"],
+            "can_support_diagnostic": data_quality["can_support_diagnostic"],
+        },
     }
     alerts = _build_alerts(concentration, low_margin, low_stock, excess_stock, active_thresholds)
     recommendations = _build_recommendations(alerts)
@@ -78,6 +78,8 @@ def run_client_analysis(client_dir: str | Path, thresholds: dict[str, float] | N
     metrics_path = diagnostics_dir / "metrics_summary.json"
     alerts_path = diagnostics_dir / "alerts.json"
     recommendations_path = diagnostics_dir / "recommendations.json"
+    data_quality_path = diagnostics_dir / "data_quality.json"
+    threshold_config_path = diagnostics_dir / "threshold_config.json"
     analysis_summary_path = diagnostics_dir / "analysis_summary.json"
     archive_dir = run_stage_dir(client_path, run_id, "analysis")
 
@@ -89,23 +91,30 @@ def run_client_analysis(client_dir: str | Path, thresholds: dict[str, float] | N
         "report_status": DiagnosticStatus.PENDING_HUMAN_REVIEW.value,
         "can_continue": True,
         "metrics": metrics,
+        "data_quality": data_quality,
+        "threshold_config": threshold_config,
         "alerts": alerts,
         "recommendations": recommendations,
         "evidence": {
             "preflight_report": gate["preflight_report"],
             "raw_fingerprints": raw_fingerprints,
             "thresholds": active_thresholds,
+            "threshold_profile": threshold_config["profile"],
         },
         "outputs": {
             "draft_json": str(draft_json_path),
             "draft_markdown": str(draft_markdown_path),
             "draft_html": str(draft_html_path),
+            "data_quality": str(data_quality_path),
+            "threshold_config": str(threshold_config_path),
             "analysis_summary": str(analysis_summary_path),
             "archive_dir": str(archive_dir),
             "archived": {
                 "metrics_summary": str(archive_dir / metrics_path.name),
                 "alerts": str(archive_dir / alerts_path.name),
                 "recommendations": str(archive_dir / recommendations_path.name),
+                "data_quality": str(archive_dir / data_quality_path.name),
+                "threshold_config": str(archive_dir / threshold_config_path.name),
                 "analysis_summary": str(archive_dir / analysis_summary_path.name),
                 "draft_json": str(archive_dir / draft_json_path.name),
                 "draft_markdown": str(archive_dir / draft_markdown_path.name),
@@ -116,11 +125,23 @@ def run_client_analysis(client_dir: str | Path, thresholds: dict[str, float] | N
     _write_json(metrics_path, metrics)
     _write_json(alerts_path, alerts)
     _write_json(recommendations_path, recommendations)
+    _write_json(data_quality_path, data_quality)
+    _write_json(threshold_config_path, threshold_config)
     _write_json(analysis_summary_path, result)
     _write_json(draft_json_path, result)
     draft_markdown_path.write_text(render_markdown_report(result), encoding="utf-8")
     draft_html_path.write_text(render_html_report(result), encoding="utf-8")
-    for path in (metrics_path, alerts_path, recommendations_path, analysis_summary_path, draft_json_path, draft_markdown_path, draft_html_path):
+    for path in (
+        metrics_path,
+        alerts_path,
+        recommendations_path,
+        data_quality_path,
+        threshold_config_path,
+        analysis_summary_path,
+        draft_json_path,
+        draft_markdown_path,
+        draft_html_path,
+    ):
         archive_file(client_path, run_id, "analysis", path)
     return result
 

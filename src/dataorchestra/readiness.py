@@ -15,6 +15,7 @@ CRITICAL_DOCS = (
     "docs/PRIVACIDAD_Y_DATOS.md",
     "docs/POLITICA_DATOS_REALES.md",
     "docs/INCIDENTES_OPERATIVOS.md",
+    "docs/CALIDAD_DATOS_Y_UMBRALES.md",
 )
 
 
@@ -42,6 +43,7 @@ def inspect_readiness(client_dir: str | Path, repo_root: str | Path | None = Non
     if status:
         checks.extend(_raw_file_checks(status))
         checks.extend(_preflight_checks(status))
+        checks.extend(_data_quality_checks(status))
         checks.extend(_review_gate_checks(status))
         checks.extend(_incident_checks(status))
         checks.extend(_closure_checks(status))
@@ -202,6 +204,36 @@ def _review_gate_checks(status: dict[str, Any]) -> list[ReadinessCheck]:
         checks.append(_warn("approval_missing", "review", "No existe aprobacion humana registrada todavia.", {}))
 
     return checks
+
+
+def _data_quality_checks(status: dict[str, Any]) -> list[ReadinessCheck]:
+    data_quality = status.get("data_quality", {})
+    if not data_quality.get("exists"):
+        return [_warn("data_quality_missing", "data_quality", "Falta calcular score de calidad de datos.", {})]
+
+    if data_quality.get("can_support_diagnostic") is False:
+        return [
+            _fail(
+                "data_quality_below_target",
+                "data_quality",
+                "El score de calidad esta por debajo del objetivo recomendado.",
+                {
+                    "score": data_quality.get("score"),
+                    "target_score": data_quality.get("target_score"),
+                    "level": data_quality.get("level"),
+                    "finding_count": data_quality.get("finding_count"),
+                },
+            )
+        ]
+
+    return [
+        _pass(
+            "data_quality_ok",
+            "data_quality",
+            "El score de calidad permite interpretar el diagnostico.",
+            {"score": data_quality.get("score"), "target_score": data_quality.get("target_score"), "level": data_quality.get("level")},
+        )
+    ]
 
 
 def _closure_checks(status: dict[str, Any]) -> list[ReadinessCheck]:

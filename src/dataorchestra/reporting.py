@@ -9,6 +9,8 @@ def render_markdown_report(analysis: dict) -> str:
     profitability = metrics["profitability"]
     stock = metrics["stock"]
     concentration = metrics["concentration"]
+    data_quality = analysis.get("data_quality") or metrics.get("data_quality") or {}
+    threshold_config = analysis.get("threshold_config") or {}
     alerts = analysis["alerts"]
     recommendations = analysis["recommendations"]
 
@@ -31,6 +33,8 @@ def render_markdown_report(analysis: dict) -> str:
         f"- Productos con stock bajo: {stock['productos_stock_bajo']}",
         f"- Productos con exceso de stock: {stock['productos_exceso']}",
         f"- Concentracion top {concentration['top_n']}: {_percent(concentration['ratio'])}",
+        f"- Calidad de datos: {_quality_label(data_quality)}",
+        f"- Perfil de umbrales: {_threshold_profile_label(threshold_config)}",
         "",
         "## Alertas",
         "",
@@ -60,6 +64,12 @@ def render_markdown_report(analysis: dict) -> str:
                 f"  - Evidencia asociada: {evidence_ids}",
             ]
         )
+
+    lines.extend(["", "## Calidad de datos", ""])
+    lines.extend(_render_markdown_quality(data_quality))
+
+    lines.extend(["", "## Umbrales aplicados", ""])
+    lines.extend(_render_markdown_thresholds(threshold_config, analysis.get("evidence", {}).get("thresholds", {})))
 
     lines.extend(
         [
@@ -94,6 +104,8 @@ def render_html_report(analysis: dict, approval: dict | None = None) -> str:
     profitability = metrics["profitability"]
     stock = metrics["stock"]
     concentration = metrics["concentration"]
+    data_quality = analysis.get("data_quality") or metrics.get("data_quality") or {}
+    threshold_config = analysis.get("threshold_config") or {}
     alerts = analysis["alerts"]
     recommendations = analysis["recommendations"]
     status = analysis.get("report_status", "pending_human_review")
@@ -110,6 +122,8 @@ def render_html_report(analysis: dict, approval: dict | None = None) -> str:
         ("Exceso stock", str(stock["productos_exceso"])),
         (f"Concentracion top {concentration['top_n']}", _percent(concentration["ratio"])),
         ("Unidades vendidas", str(sales["unidades_vendidas"])),
+        ("Calidad datos", _quality_label(data_quality)),
+        ("Perfil umbrales", _threshold_profile_label(threshold_config)),
     ]
 
     approval_block = ""
@@ -210,6 +224,9 @@ def render_html_report(analysis: dict, approval: dict | None = None) -> str:
     .approval-grid p {{ padding: 14px; margin: 0; background: white; }}
     .approval-grid .wide {{ grid-column: 1 / -1; }}
     .note {{ color: var(--muted); font-size: 13px; }}
+    .thresholds {{ width: 100%; border-collapse: collapse; }}
+    .thresholds td {{ padding: 10px 12px; border: 1px solid var(--line); }}
+    .thresholds td:first-child {{ color: var(--muted); font-weight: 700; }}
     footer {{ padding: 22px 40px; color: var(--muted); border-top: 1px solid var(--line); font-size: 12px; }}
     @media (max-width: 760px) {{
       main {{ width: 100%; margin: 0; border: 0; }}
@@ -252,6 +269,14 @@ def render_html_report(analysis: dict, approval: dict | None = None) -> str:
       {_render_html_recommendations(recommendations)}
     </section>
     <section>
+      <h2>Calidad de datos</h2>
+      {_render_html_quality(data_quality)}
+    </section>
+    <section>
+      <h2>Umbrales aplicados</h2>
+      {_render_html_thresholds(threshold_config, analysis.get("evidence", {}).get("thresholds", {}))}
+    </section>
+    <section>
       <h2>Evidencia y controles</h2>
       <p class="note">Preflight aprobado: {_html(analysis["evidence"]["preflight_report"])}</p>
       <div class="controls">
@@ -289,6 +314,53 @@ def _format_evidence(evidence: dict) -> str:
         if key in evidence:
             parts.append(f"{key}={evidence[key]}")
     return "; ".join(parts) if parts else "sin_evidencia_registrada"
+
+
+def _quality_label(data_quality: dict) -> str:
+    if not data_quality:
+        return "sin_dato"
+    score = data_quality.get("score", "sin_score")
+    level = data_quality.get("level", "sin_nivel")
+    return f"{score}/100 ({level})"
+
+
+def _threshold_profile_label(threshold_config: dict) -> str:
+    if not threshold_config:
+        return "default"
+    return str(threshold_config.get("profile") or "default")
+
+
+def _render_markdown_quality(data_quality: dict) -> list[str]:
+    if not data_quality:
+        return ["- Calidad de datos no calculada en este analisis."]
+
+    lines = [
+        f"- Score: {_quality_label(data_quality)}",
+        f"- Puede respaldar diagnostico: {data_quality.get('can_support_diagnostic')}",
+        f"- Resumen: {data_quality.get('summary')}",
+        f"- Accion recomendada: {data_quality.get('recommended_action')}",
+    ]
+    findings = data_quality.get("findings") or []
+    if findings:
+        lines.append("- Observaciones principales:")
+        for finding in findings[:6]:
+            lines.append(f"  - {finding.get('severity')} | {finding.get('id')}: {finding.get('message')}")
+    else:
+        lines.append("- No se detectaron observaciones relevantes de calidad.")
+    return lines
+
+
+def _render_markdown_thresholds(threshold_config: dict, thresholds: dict) -> list[str]:
+    if not threshold_config and not thresholds:
+        return ["- No hay umbrales registrados."]
+    active = threshold_config.get("thresholds") or thresholds
+    lines = [
+        f"- Rubro/perfil: {_threshold_profile_label(threshold_config)}",
+        f"- Fuentes: {', '.join(threshold_config.get('sources') or ['default'])}",
+    ]
+    for key in sorted(active):
+        lines.append(f"- `{key}`: {active[key]}")
+    return lines
 
 
 def _html(value: object) -> str:
@@ -332,6 +404,44 @@ def _render_html_recommendations(recommendations: list[dict]) -> str:
             """
         )
     return "".join(output)
+
+
+def _render_html_quality(data_quality: dict) -> str:
+    if not data_quality:
+        return '<p class="note">Calidad de datos no calculada en este analisis.</p>'
+    findings = data_quality.get("findings") or []
+    items = "".join(
+        f'<li>{_html(item.get("severity"))} | {_html(item.get("id"))}: {_html(item.get("message"))}</li>' for item in findings[:6]
+    )
+    findings_block = f"<ul>{items}</ul>" if items else '<p class="note">No se detectaron observaciones relevantes de calidad.</p>'
+    return f"""
+      <div class="cards">
+        {_summary_card("Score", _quality_label(data_quality))}
+        {_summary_card("Soporta diagnostico", str(data_quality.get("can_support_diagnostic")))}
+        {_summary_card("Filas ventas", _row_count(data_quality, "ventas"))}
+        {_summary_card("Target", str(data_quality.get("target_score", "sin_dato")))}
+      </div>
+      <p>{_html(data_quality.get("summary"))}</p>
+      <p><strong>Accion recomendada:</strong> {_html(data_quality.get("recommended_action"))}</p>
+      {findings_block}
+    """
+
+
+def _row_count(data_quality: dict, dataset: str) -> str:
+    return str((data_quality.get("row_counts") or {}).get(dataset, "sin_dato"))
+
+
+def _render_html_thresholds(threshold_config: dict, thresholds: dict) -> str:
+    active = threshold_config.get("thresholds") or thresholds
+    if not active:
+        return '<p class="note">No hay umbrales registrados.</p>'
+    rows = "".join(
+        f"<tr><td>{_html(key)}</td><td>{_html(value)}</td></tr>" for key, value in sorted(active.items())
+    )
+    return f"""
+      <p class="note">Perfil aplicado: {_html(_threshold_profile_label(threshold_config))}. Fuentes: {_html(", ".join(threshold_config.get("sources") or ["default"]))}</p>
+      <table class="thresholds"><tbody>{rows}</tbody></table>
+    """
 
 
 def _fingerprint_control(item: dict) -> str:

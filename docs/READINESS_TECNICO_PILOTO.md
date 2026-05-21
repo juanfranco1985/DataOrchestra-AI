@@ -22,6 +22,7 @@ python -m dataorchestra.cli readiness --client-dir "C:\Documentos\DataOrchestra_
 - Existencia de `client.yaml`.
 - Presencia de `ventas.csv`, `productos.csv` y `stock.csv`.
 - Estado del preflight.
+- Score de calidad de datos.
 - Existencia de borrador y bloqueo por revision humana.
 - Existencia de aprobacion humana si ya se llego a entrega.
 - Incidentes operativos abiertos.
@@ -57,6 +58,8 @@ Ejecutar readiness:
 6. despues de cualquier incidente operativo.
 
 Si hay incidentes abiertos con severidad `alta` o `media`, `readiness` queda bloqueado hasta ejecutar `resolve-incident`.
+
+Si existe un score de calidad por debajo del objetivo configurado, `readiness` queda bloqueado hasta revisar o corregir los datos.
 
 ## Limite
 
