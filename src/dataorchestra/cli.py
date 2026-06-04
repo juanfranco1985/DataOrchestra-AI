@@ -19,7 +19,15 @@ from dataorchestra.privacy import scan_csv_files
 from dataorchestra.readiness import inspect_readiness
 from dataorchestra.recommendations import UPDATEABLE_RECOMMENDATION_STATUSES, load_recommendation_tracking, update_recommendation_status
 from dataorchestra.runs import archive_file, new_run_id, run_stage_dir
-from dataorchestra.runtime import close_pilot, default_runtime_dir, prepare_runtime
+from dataorchestra.runtime import (
+    DELIVERY_METHODS,
+    RETENTION_ACTIONS,
+    close_pilot,
+    default_runtime_dir,
+    mark_delivered,
+    prepare_runtime,
+    record_retention_action,
+)
 from dataorchestra.states import DiagnosticStatus
 from dataorchestra.status import inspect_client_status
 from dataorchestra.thresholds import resolve_thresholds
@@ -287,6 +295,56 @@ def run_close_pilot(client_dir: str | Path, reviewer: str, notes: str, outcome: 
     return result
 
 
+def run_mark_delivered(client_dir: str | Path, recipient: str, method: str, notes: str, confirm_delivery: bool) -> dict:
+    client_path = Path(client_dir)
+    result = mark_delivered(
+        client_path,
+        recipient=recipient,
+        method=method,
+        notes=notes,
+        confirm_delivery=confirm_delivery,
+    )
+    append_audit_event(
+        client_path / "logs" / "audit.jsonl",
+        "delivery",
+        str(result.get("client_id") or _read_client_id(client_path)),
+        str(result.get("status")),
+        {
+            "run_id": result.get("run_id"),
+            "delivery_record": result.get("delivery_record"),
+        },
+    )
+    return result
+
+
+def run_record_retention(
+    client_dir: str | Path,
+    responsible: str,
+    action: str,
+    notes: str,
+    confirm_retention_review: bool,
+) -> dict:
+    client_path = Path(client_dir)
+    result = record_retention_action(
+        client_path,
+        responsible=responsible,
+        action=action,
+        notes=notes,
+        confirm_retention_review=confirm_retention_review,
+    )
+    append_audit_event(
+        client_path / "logs" / "audit.jsonl",
+        "retention",
+        str(result.get("client_id") or _read_client_id(client_path)),
+        str(result.get("status")),
+        {
+            "retention_record": result.get("retention_record"),
+            "data_retention_action_required": result.get("data_retention_action_required"),
+        },
+    )
+    return result
+
+
 def run_incident(
     client_dir: str | Path,
     incident_type: str,
@@ -365,7 +423,7 @@ def _read_client_id(client_path: Path) -> str:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="DataOrchestra AI v2.0 pilot tools")
+    parser = argparse.ArgumentParser(description="DataOrchestra AI v2.1 integrated pilot tools")
     sub = parser.add_subparsers(dest="command", required=True)
 
     init_client = sub.add_parser("init-client", help="Create a new controlled pilot client workspace")
@@ -428,6 +486,20 @@ def main() -> int:
     close.add_argument("--notes", required=True)
     close.add_argument("--outcome", choices=["completed", "not_viable", "needs_follow_up", "converted_to_service"], required=True)
     close.add_argument("--confirm-close", action="store_true")
+
+    delivered = sub.add_parser("mark-delivered", help="Register delivery of an approved report")
+    delivered.add_argument("--client-dir", required=True)
+    delivered.add_argument("--recipient", required=True)
+    delivered.add_argument("--method", choices=sorted(DELIVERY_METHODS), required=True)
+    delivered.add_argument("--notes", required=True)
+    delivered.add_argument("--confirm-delivery", action="store_true")
+
+    retention = sub.add_parser("record-retention", help="Register manual retention or deletion review after closure")
+    retention.add_argument("--client-dir", required=True)
+    retention.add_argument("--responsible", required=True)
+    retention.add_argument("--action", choices=sorted(RETENTION_ACTIONS), required=True)
+    retention.add_argument("--notes", required=True)
+    retention.add_argument("--confirm-retention-review", action="store_true")
 
     incident = sub.add_parser("incident", help="Register an operational incident without storing sensitive values")
     incident.add_argument("--client-dir", required=True)
@@ -525,6 +597,26 @@ def main() -> int:
         result = run_close_pilot(args.client_dir, reviewer=args.reviewer, notes=args.notes, outcome=args.outcome, confirm_close=args.confirm_close)
         print(json.dumps(result, indent=2, ensure_ascii=False))
         return 0 if result["status"] == DiagnosticStatus.PILOT_CLOSED.value else 2
+    if args.command == "mark-delivered":
+        result = run_mark_delivered(
+            args.client_dir,
+            recipient=args.recipient,
+            method=args.method,
+            notes=args.notes,
+            confirm_delivery=args.confirm_delivery,
+        )
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        return 0 if result["status"] == DiagnosticStatus.DELIVERED.value else 2
+    if args.command == "record-retention":
+        result = run_record_retention(
+            args.client_dir,
+            responsible=args.responsible,
+            action=args.action,
+            notes=args.notes,
+            confirm_retention_review=args.confirm_retention_review,
+        )
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        return 0 if result["status"] == "retention_recorded" else 2
     if args.command == "incident":
         result = run_incident(
             args.client_dir,

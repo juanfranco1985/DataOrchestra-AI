@@ -1,4 +1,4 @@
-# Estado actual - DataOrchestra AI v2.0
+﻿# Estado actual - DataOrchestra AI v2.0
 
 Fecha de corte: 2026-05-20
 
@@ -11,7 +11,7 @@ No debe presentarse aun como SaaS, plataforma autoservicio ni producto final esc
 ## Estructura actual
 
 ```text
-v2_0_primer_piloto_real_controlado/
+DataOrchestra_AI_v2_1_integrado/
   src/dataorchestra/
     analytics/              Motor deterministico de diagnostico
     approval.py             Aprobacion humana auditable
@@ -111,7 +111,7 @@ dataorchestra approve --client-dir clients/cliente_001 --reviewer "Nombre respon
 - Caso demo ficticio reproducible.
 - Web institucional integrada en el repositorio.
 - Deploy estatico de la web preparado para GitHub Pages.
-- Formulario de contacto controlado por email, sin backend ni carga de archivos.
+- Formulario de contacto controlado por email o webhook/CRM configurable, sin backend propio ni carga de archivos.
 - FAQ publica e interna para preguntas comerciales, privacidad y limites del piloto.
 - Base publica de terminos y privacidad para la web institucional.
 - Repositorio remoto GitHub integrado: `juanfranco1985/DataOrchestra-AI`.
@@ -203,6 +203,7 @@ Web Next.js                   -> npm run build OK, export estatico preparado
 Web GitHub Pages              -> build OK con basePath /DataOrchestra-AI
 Web FAQ comercial             -> ruta /faq incluida en export estatico
 Web terminos y privacidad     -> ruta /terminos-privacidad incluida en export estatico
+Formulario web                -> email y webhook/CRM configurable
 Export PDF demo               -> OK con Microsoft Edge headless
 Panel interno local           -> compileall OK, helpers testeados
 ```
@@ -211,7 +212,7 @@ Panel interno local           -> compileall OK, helpers testeados
 
 - No hay validacion con cliente real todavia.
 - GitHub Pages requiere activar `Settings -> Pages -> GitHub Actions` en el repositorio.
-- El formulario de contacto requiere configurar `DATAORCHESTRA_CONTACT_EMAIL` para salir con destinatario.
+- El formulario de contacto requiere configurar `DATAORCHESTRA_CONTACT_EMAIL` para salir con destinatario o `DATAORCHESTRA_CONTACT_WEBHOOK_URL` para registrar leads automaticamente.
 - La pagina de terminos y privacidad es una base institucional; requiere revision legal antes de uso contractual definitivo.
 - Hay aceptacion operativa de piloto, pero no contrato legal formal revisado.
 - El panel interno es local y operativo; todavia no es multiusuario ni tiene autenticacion propia.
@@ -256,3 +257,4 @@ Despues de esa prueba, decidir una de estas opciones:
 - Servicio inicial supervisado: 7/10.
 - Producto final escalable: 5/10.
 - SaaS/autoservicio: no corresponde aun.
+

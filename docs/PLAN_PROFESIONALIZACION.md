@@ -78,7 +78,8 @@ Objetivo: recibir datos reales sin mezclarlos con codigo, demo o entregables ver
 - Politica operativa de datos reales. Estado: implementado.
 - Checklist previo a cliente real. Estado: implementado.
 - Cierre auditable de piloto. Estado: implementado con `close-pilot`.
-- Retencion o borrado manual posterior al cierre. Estado: documentado.
+- Registro de entrega controlada. Estado: implementado con `mark-delivered`.
+- Retencion o borrado manual posterior al cierre. Estado: implementado con `record-retention`.
 
 ## Fase 6 - Producto comercial minimo
 

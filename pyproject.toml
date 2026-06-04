@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dataorchestra-pilot"
-version = "2.0.0"
-description = "Controlled pilot tooling for DataOrchestra AI"
+version = "2.1.0"
+description = "Integrated controlled pilot workspace for DataOrchestra AI"
 requires-python = ">=3.11"
 dependencies = [
   "pyyaml>=6.0",

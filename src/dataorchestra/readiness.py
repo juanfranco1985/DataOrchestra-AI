@@ -174,6 +174,7 @@ def _review_gate_checks(status: dict[str, Any]) -> list[ReadinessCheck]:
     checks: list[ReadinessCheck] = []
     analysis = status["analysis"]
     approval = status["approval"]
+    delivery = status.get("delivery", {})
 
     if analysis["exists"]:
         if analysis.get("report_status") == DiagnosticStatus.PENDING_HUMAN_REVIEW.value:
@@ -208,6 +209,18 @@ def _review_gate_checks(status: dict[str, Any]) -> list[ReadinessCheck]:
         )
     else:
         checks.append(_warn("approval_missing", "review", "No existe aprobacion humana registrada todavia.", {}))
+
+    if delivery.get("exists"):
+        checks.append(
+            _pass(
+                "delivery_record_exists",
+                "delivery",
+                "La entrega del informe aprobado esta registrada.",
+                {"method": delivery.get("method"), "delivered_at": delivery.get("delivered_at")},
+            )
+        )
+    elif approval.get("exists"):
+        checks.append(_warn("delivery_missing", "delivery", "El informe aprobado aun no tiene entrega registrada.", {}))
 
     return checks
 
@@ -283,16 +296,26 @@ def _recommendation_checks(status: dict[str, Any]) -> list[ReadinessCheck]:
 
 def _closure_checks(status: dict[str, Any]) -> list[ReadinessCheck]:
     closure = status["closure"]
+    retention = status.get("retention", {})
     if not closure["exists"]:
         return [_warn("pilot_not_closed", "closure", "El piloto aun no tiene cierre operativo registrado.", {})]
 
-    if closure.get("data_retention_action_required"):
+    if closure.get("data_retention_action_required") and not retention.get("exists"):
         return [
             _warn(
                 "retention_review_required",
                 "closure",
                 "El cierre requiere revisar retencion o borrado de datos.",
                 {"outcome": closure.get("outcome"), "closed_at": closure.get("closed_at")},
+            )
+        ]
+    if retention.get("exists"):
+        return [
+            _pass(
+                "retention_record_exists",
+                "closure",
+                "La retencion o borrado posterior al cierre esta registrado.",
+                {"action": retention.get("action"), "reviewed_at": retention.get("reviewed_at")},
             )
         ]
 

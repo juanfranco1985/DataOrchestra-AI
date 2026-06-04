@@ -64,6 +64,24 @@ El borrado debe ser manual, deliberado y registrado. Antes de borrar:
 - registrar responsable, fecha y motivo;
 - eliminar archivos raw y derivados segun politica acordada.
 
+## Registro de retencion o borrado
+
+Despues de cerrar el piloto, registrar la decision operativa:
+
+```powershell
+python -m dataorchestra.cli record-retention --client-dir <cliente> --responsible "Responsable" --action raw_deleted --notes "Raw eliminado manualmente segun politica acordada" --confirm-retention-review
+```
+
+Acciones permitidas:
+
+- `raw_deleted`
+- `derived_deleted`
+- `approved_report_retained`
+- `retained_by_agreement`
+- `not_applicable`
+
+El comando no borra archivos automaticamente. Deja evidencia en `diagnostics/closure/retention_record.json` y marca el cierre como revisado.
+
 ## Cierre
 
 Todo piloto debe cerrarse con:
@@ -79,4 +97,4 @@ Resultados permitidos:
 - `needs_follow_up`
 - `converted_to_service`
 
-El cierre no borra datos automaticamente. Deja constancia y obliga a revisar retencion/borrado.
+El cierre no borra datos automaticamente. Deja constancia y obliga a revisar retencion/borrado con `record-retention`.

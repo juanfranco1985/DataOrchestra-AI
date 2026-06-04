@@ -72,6 +72,6 @@ La revision humana debe mirar especialmente:
 
 ## Estado
 
-Implementado para `v2.0 - Primer Piloto Real Controlado`.
+Implementado y vigente en `v2.1 - Version Integradora`.
 
 El siguiente paso natural es usar esta confianza para ordenar el resumen ejecutivo y destacar primero hallazgos de alta prioridad con confianza suficiente.

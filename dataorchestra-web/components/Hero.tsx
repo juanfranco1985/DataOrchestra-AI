@@ -21,7 +21,7 @@ export function Hero() {
       <div className="site-shell grid min-h-[calc(100vh-65px)] items-center gap-10 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:py-20">
         <div className="max-w-3xl">
           <p className="mb-5 inline-flex rounded border border-mint/30 bg-mint/10 px-3 py-1 text-sm font-medium text-mint">
-            v2.0 - Primer Piloto Real Controlado
+            v2.1 - Version Integradora
           </p>
           <h1 className="max-w-4xl text-4xl font-semibold leading-tight tracking-normal text-white sm:text-5xl lg:text-6xl">
             Transformamos datos simples de tu PyME en decisiones comerciales claras

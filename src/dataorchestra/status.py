@@ -20,11 +20,13 @@ def inspect_client_status(client_dir: str | Path) -> dict[str, Any]:
     preflight = _read_json(client_path / "diagnostics" / "preflight" / "preflight_report.json")
     analysis = _read_json(client_path / "reports" / "diagnostico_borrador.json")
     approval = _read_json(client_path / "diagnostics" / "review" / "approval_record.json")
+    delivery = _read_json(client_path / "diagnostics" / "delivery" / "delivery_record.json")
     closure = _read_json(client_path / "diagnostics" / "closure" / "closure_record.json")
+    retention = _read_json(client_path / "diagnostics" / "closure" / "retention_record.json")
     data_quality = _read_json(client_path / "diagnostics" / "analysis" / "data_quality.json") or _read_json(client_path / "diagnostics" / "data_quality" / "data_quality_report.json")
     config = _read_yaml(client_path / "client.yaml")
     raw_files = _raw_files_status(raw_dir)
-    current_stage = _current_stage(raw_files, preflight, analysis, approval, closure, config)
+    current_stage = _current_stage(raw_files, preflight, analysis, approval, delivery, closure, config)
     incidents = summarize_incidents(client_path)
     recommendations = summarize_recommendations(client_path)
 
@@ -37,7 +39,9 @@ def inspect_client_status(client_dir: str | Path) -> dict[str, Any]:
         "preflight": _preflight_status(preflight),
         "analysis": _analysis_status(analysis),
         "approval": _approval_status(approval),
+        "delivery": _delivery_status(delivery),
         "closure": _closure_status(closure),
+        "retention": _retention_status(retention),
         "data_quality": _data_quality_status(data_quality),
         "recommendations": recommendations,
         "incidents": incidents,
@@ -50,6 +54,7 @@ def _current_stage(
     preflight: dict | None,
     analysis: dict | None,
     approval: dict | None,
+    delivery: dict | None,
     closure: dict | None,
     config: dict,
 ) -> str:
@@ -57,6 +62,10 @@ def _current_stage(
         return DiagnosticStatus.PILOT_CLOSED.value
     if config.get("client", {}).get("status") == DiagnosticStatus.PILOT_CLOSED.value:
         return DiagnosticStatus.PILOT_CLOSED.value
+    if delivery and delivery.get("status") == DiagnosticStatus.DELIVERED.value:
+        return DiagnosticStatus.DELIVERED.value
+    if config.get("client", {}).get("status") == DiagnosticStatus.DELIVERED.value:
+        return DiagnosticStatus.DELIVERED.value
     if approval and approval.get("status") == DiagnosticStatus.APPROVED_FOR_DELIVERY.value:
         return DiagnosticStatus.APPROVED_FOR_DELIVERY.value
     if analysis and analysis.get("report_status") == DiagnosticStatus.PENDING_HUMAN_REVIEW.value:
@@ -77,7 +86,8 @@ def _next_action(stage: str) -> str:
         DiagnosticStatus.DATA_FIX_REQUIRED.value: "Pedir correccion de archivos y ejecutar preflight nuevamente.",
         DiagnosticStatus.READY_FOR_ANALYSIS.value: "Ejecutar analyze para generar borradores internos.",
         DiagnosticStatus.PENDING_HUMAN_REVIEW.value: "Revisar el borrador y aprobar solo con confirmacion humana.",
-        DiagnosticStatus.APPROVED_FOR_DELIVERY.value: "Entregar solo el informe aprobado o exportarlo a PDF.",
+        DiagnosticStatus.APPROVED_FOR_DELIVERY.value: "Entregar solo el informe aprobado y registrar entrega con mark-delivered.",
+        DiagnosticStatus.DELIVERED.value: "Cerrar piloto con close-pilot y registrar retencion o borrado.",
         DiagnosticStatus.PILOT_CLOSED.value: "No procesar mas datos. Revisar retencion o borrado segun politica.",
         "preflight_required": "Ejecutar preflight antes de analizar.",
     }
@@ -137,6 +147,19 @@ def _approval_status(approval: dict | None) -> dict[str, Any]:
     }
 
 
+def _delivery_status(delivery: dict | None) -> dict[str, Any]:
+    if not delivery:
+        return {"exists": False}
+    return {
+        "exists": True,
+        "status": delivery.get("status"),
+        "run_id": delivery.get("run_id"),
+        "recipient": delivery.get("recipient"),
+        "method": delivery.get("method"),
+        "delivered_at": delivery.get("delivered_at"),
+    }
+
+
 def _closure_status(closure: dict | None) -> dict[str, Any]:
     if not closure:
         return {"exists": False}
@@ -147,6 +170,20 @@ def _closure_status(closure: dict | None) -> dict[str, Any]:
         "reviewer": closure.get("reviewer"),
         "closed_at": closure.get("closed_at"),
         "data_retention_action_required": closure.get("data_retention_action_required"),
+        "retention_action": closure.get("retention_action"),
+        "retention_reviewed_at": closure.get("retention_reviewed_at"),
+    }
+
+
+def _retention_status(retention: dict | None) -> dict[str, Any]:
+    if not retention:
+        return {"exists": False}
+    return {
+        "exists": True,
+        "status": retention.get("status"),
+        "action": retention.get("action"),
+        "responsible": retention.get("responsible"),
+        "reviewed_at": retention.get("reviewed_at"),
     }
 
 

@@ -136,6 +136,14 @@ python -m dataorchestra.cli export-pdf --client-dir clients/cliente_001
 
 El comando se bloquea si no existe informe aprobado.
 
+Despues de entregar el informe aprobado, registrar la entrega:
+
+```powershell
+python -m dataorchestra.cli mark-delivered --client-dir clients/cliente_001 --recipient "Nombre responsable cliente" --method email --notes "Informe aprobado enviado" --confirm-delivery
+```
+
+Este registro crea `diagnostics/delivery/delivery_record.json` y deja el cliente en estado `delivered`.
+
 ## 7. Cierre
 
 Registrar feedback del cliente, tiempos, errores, objeciones, utilidad percibida y decision de continuidad.
@@ -146,4 +154,8 @@ Cerrar el piloto:
 python -m dataorchestra.cli close-pilot --client-dir clients/cliente_001 --reviewer "Nombre responsable" --notes "Cierre registrado" --outcome completed --confirm-close
 ```
 
-Despues del cierre, revisar retencion o borrado segun `docs/POLITICA_DATOS_REALES.md`.
+Despues del cierre, revisar y registrar retencion o borrado segun `docs/POLITICA_DATOS_REALES.md`:
+
+```powershell
+python -m dataorchestra.cli record-retention --client-dir clients/cliente_001 --responsible "Nombre responsable" --action raw_deleted --notes "Raw eliminado manualmente segun politica acordada" --confirm-retention-review
+```

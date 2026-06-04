@@ -83,6 +83,6 @@ El seguimiento no aprueba entregas por si solo. La aprobacion formal sigue depen
 
 ## Estado
 
-Implementado para `v2.0 - Primer Piloto Real Controlado`.
+Implementado y vigente en `v2.1 - Version Integradora`.
 
 Siguiente mejora posible: ordenar el resumen ejecutivo por prioridad, confianza y estado de seguimiento.

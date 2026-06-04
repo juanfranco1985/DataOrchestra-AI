@@ -57,5 +57,6 @@ El panel interno puede usar `DATAORCHESTRA_CLIENTS_ROOT` para operar sobre el ru
 - Usar una carpeta por cliente.
 - No mezclar archivos de clientes.
 - No editar `raw/` despues del preflight sin repetir preflight.
+- Registrar la entrega con `mark-delivered`.
 - Cerrar cada piloto con `close-pilot`.
-- Revisar retencion o borrado al cerrar.
+- Revisar y registrar retencion o borrado con `record-retention`.

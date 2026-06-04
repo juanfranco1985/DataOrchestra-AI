@@ -18,7 +18,7 @@ El tono es directo y prudente. Se evita prometer resultados, automatización tot
 
 ## Por qué no se presenta como SaaS
 
-El estado real del proyecto es v2.0 - Primer Piloto Real Controlado. Todavía faltan validación con clientes reales, operación productiva completa, contrato formal, interfaz interna profesional y proceso escalable. Presentarlo como SaaS generaría una expectativa incorrecta.
+El estado real del proyecto es v2.1 - Version Integradora para primer piloto real controlado. Todavía faltan validación con clientes reales, operación productiva completa, contrato formal, interfaz interna profesional y proceso escalable. Presentarlo como SaaS generaría una expectativa incorrecta.
 
 ## Por qué se destaca revisión humana
 

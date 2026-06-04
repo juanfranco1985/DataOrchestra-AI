@@ -1,0 +1,48 @@
+{
+  "project": "DataOrchestra AI",
+  "unit": "v2.1 - Version Integradora",
+  "created_from": [
+    "DataOrchestra AI v1.95 consolidated package",
+    "v2.0 - Primer Piloto Real Controlado",
+    "integrated institutional web"
+  ],
+  "purpose": "single canonical workspace for controlled commercial pilots",
+  "status": "canonical_working_version",
+  "canonical_folder": "DataOrchestra_AI_v2_1_integrado",
+  "supersedes_for_daily_work": [
+    "dataorchestra-web",
+    "DataOrchestra_AI_Proyecto_Consolidado_para_Codex_v1_95/v2_0_primer_piloto_real_controlado"
+  ],
+  "preserve_as_history": [
+    "__audit_extract",
+    "DataOrchestra_AI_Proyecto_Consolidado_para_Codex_v1_95",
+    "AUDITORIA_CONTROL_TOTAL_v1_95.md"
+  ],
+  "delivery_policy": {
+    "raw_files_mutable": false,
+    "human_review_required": true,
+    "default_report_status": "pending_human_review",
+    "privacy_blocking_enabled": true
+  },
+  "entrypoints": {
+    "backend_tests": "python -m pytest -q",
+    "backend_cli": "python -m dataorchestra.cli --help",
+    "web_build": "cmd /c npm.cmd run build",
+    "web_dev": "cmd /c npm.cmd run dev"
+  },
+  "included_areas": [
+    "src/dataorchestra",
+    "tests",
+    "tools",
+    "clients/cliente_001",
+    "templates",
+    "demos",
+    "checklists",
+    "docs",
+    "exports",
+    "contracts",
+    "dataorchestra-web",
+    ".github/workflows",
+    ".gitignore"
+  ]
+}

@@ -4,11 +4,11 @@ Este documento deja sentado el camino para llevar DataOrchestra AI desde piloto 
 
 ## Estado actual
 
-DataOrchestra AI esta en etapa `v2.0 - Primer Piloto Real Controlado`.
+DataOrchestra AI esta en etapa `v2.1 - Version Integradora`.
 
 Ya cuenta con:
 
-- flujo operativo `preflight -> analyze -> approve`;
+- flujo operativo `preflight -> analyze -> approve -> mark-delivered -> close-pilot -> record-retention`;
 - soporte multi-cliente;
 - auditoria y `run_id`;
 - validacion de privacidad y estructura CSV;
@@ -125,6 +125,7 @@ Objetivo: poder vender pilotos con expectativa clara.
 - [x] Preparar deploy web en GitHub Pages.
 - [x] Crear formulario de contacto controlado por email.
 - [x] Agregar FAQ comercial publica e interna.
+- [x] Crear propuesta comercial piloto con precios iniciales.
 - [x] Agregar base publica de terminos y privacidad.
 - [x] Documentar incidentes operativos y readiness tecnico.
 - [x] Implementar registro y resolucion auditable de incidentes operativos.
@@ -135,5 +136,8 @@ Objetivo: poder vender pilotos con expectativa clara.
 - [x] Implementar comparacion por periodos.
 - [x] Implementar confianza operativa por hallazgo.
 - [x] Implementar seguimiento de recomendaciones.
+- [x] Integrar webhook/CRM configurable para solicitudes.
+- [x] Registrar entrega controlada con `mark-delivered`.
+- [x] Registrar retencion o borrado manual con `record-retention`.
 - [ ] Publicar web online.
-- [ ] Integrar backend, webhook o CRM.
+- [ ] Configurar proveedor real de webhook/CRM y probar formulario publicado.
