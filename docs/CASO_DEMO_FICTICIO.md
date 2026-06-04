@@ -1,4 +1,4 @@
-# Caso demo ficticio - Retail Santa Clara
+﻿# Caso demo ficticio - Retail Santa Clara
 
 Este caso permite ejecutar el flujo completo sin usar datos reales.
 
@@ -17,7 +17,7 @@ demos/retail_santa_clara/
 
 ## Ejecutar demo
 
-Desde la raiz de `v2_0_primer_piloto_real_controlado/`:
+Desde la raiz de `DataOrchestra_AI_v2_1_integrado/`:
 
 ```powershell
 $env:PYTHONPATH="src"
@@ -47,3 +47,4 @@ Usar este caso para:
 - entrenar la operacion interna antes del primer cliente.
 
 No usar este caso como evidencia de resultados reales.
+

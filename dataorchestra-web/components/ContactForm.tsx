@@ -24,8 +24,13 @@ const initialState: FormState = {
   website: ""
 };
 
-const recipientEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "";
+const recipientEmail = (process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "").trim();
+const rawContactWebhookUrl = (process.env.NEXT_PUBLIC_CONTACT_WEBHOOK_URL ?? "").trim();
+const contactWebhookUrl = parseSecureWebhookUrl(rawContactWebhookUrl);
+const contactIntegrationName = (process.env.NEXT_PUBLIC_CONTACT_INTEGRATION_NAME ?? "webhook/CRM").trim() || "webhook/CRM";
 const maxMessageLength = 800;
+const minSubmitDelayMs = 1500;
+const webhookTimeoutMs = 8000;
 
 const sensitiveMessagePatterns = [
   { label: "telefonos", pattern: /(?:\+?\d[\s().-]*){8,}/ },
@@ -40,6 +45,17 @@ function normalize(value: string): string {
 
 function validateEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function parseSecureWebhookUrl(value: string): string {
+  if (!value) return "";
+
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" ? url.toString() : "";
+  } catch {
+    return "";
+  }
 }
 
 function findSensitiveMessageMatch(message: string): string | null {
@@ -67,12 +83,58 @@ function buildRequestBody(state: FormState): string {
   ].join("\n");
 }
 
+function buildWebhookPayload(state: FormState, requestBody: string, pageUrl: string) {
+  return {
+    source: "dataorchestra-web",
+    source_page: pageUrl,
+    submitted_at: new Date().toISOString(),
+    lead_status: "new",
+    name: normalize(state.name),
+    company: normalize(state.company),
+    email: normalize(state.email),
+    industry: normalize(state.industry),
+    message: state.message.trim(),
+    privacy_scope_confirmed: state.acceptedPrivacyScope,
+    no_files_notice: true,
+    request_text: requestBody
+  };
+}
+
+async function submitWebhook(payload: ReturnType<typeof buildWebhookPayload>) {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), webhookTimeoutMs);
+
+  try {
+    const response = await fetch(contactWebhookUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload),
+      credentials: "omit",
+      keepalive: true,
+      referrerPolicy: "strict-origin-when-cross-origin",
+      signal: controller.signal
+    });
+
+    if (!response.ok) {
+      throw new Error(`Webhook returned ${response.status}`);
+    }
+  } finally {
+    window.clearTimeout(timeout);
+  }
+}
+
 export function ContactForm() {
   const [formState, setFormState] = useState<FormState>(initialState);
   const [errors, setErrors] = useState<string[]>([]);
   const [status, setStatus] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formOpenedAt] = useState(() => Date.now());
   const requestBody = useMemo(() => buildRequestBody(formState), [formState]);
   const hasConfiguredRecipient = Boolean(recipientEmail);
+  const hasConfiguredWebhook = Boolean(contactWebhookUrl);
+  const hasInvalidWebhookConfig = Boolean(rawContactWebhookUrl) && !hasConfiguredWebhook;
 
   function updateField(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const target = event.target;
@@ -95,12 +157,15 @@ export function ContactForm() {
     setStatus("");
   }
 
-  function validateForm(): string[] {
+  function validateForm(requireDeliveryChannel = false): string[] {
     const nextErrors: string[] = [];
     const sensitiveMatch = findSensitiveMessageMatch(formState.message);
 
     if (formState.website.trim()) {
       return ["No se pudo validar la solicitud."];
+    }
+    if (Date.now() - formOpenedAt < minSubmitDelayMs) {
+      return ["No se pudo validar la solicitud. Intentá nuevamente."];
     }
 
     if (!normalize(formState.name)) nextErrors.push("Ingresá tu nombre.");
@@ -117,18 +182,44 @@ export function ContactForm() {
     if (!formState.acceptedPrivacyScope) {
       nextErrors.push("Confirmá que entendés el uso de datos anonimizados y revisión humana.");
     }
+    if (hasInvalidWebhookConfig) {
+      nextErrors.push("El webhook configurado no es HTTPS válido. Corregí la configuración o usá Copiar.");
+    }
+    if (requireDeliveryChannel && !hasConfiguredWebhook && !hasConfiguredRecipient) {
+      nextErrors.push("No hay email operativo ni webhook configurado. Usá Copiar o configurá un canal de contacto.");
+    }
 
     return nextErrors;
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const validationErrors = validateForm();
+    const validationErrors = validateForm(true);
     setErrors(validationErrors);
 
     if (validationErrors.length > 0) {
       setStatus("");
+      return;
+    }
+
+    if (hasConfiguredWebhook) {
+      setIsSubmitting(true);
+
+      try {
+        const pageUrl = typeof window !== "undefined" ? window.location.href : "";
+        await submitWebhook(buildWebhookPayload(formState, requestBody, pageUrl));
+        setFormState(initialState);
+        setStatus(`Solicitud registrada en ${contactIntegrationName}. Revisá el canal configurado antes de avanzar.`);
+      } catch {
+        setErrors([
+          "No se pudo registrar la solicitud en el webhook configurado. Probá copiar la solicitud o revisar la integración."
+        ]);
+        setStatus("");
+      } finally {
+        setIsSubmitting(false);
+      }
+
       return;
     }
 
@@ -143,7 +234,7 @@ export function ContactForm() {
   }
 
   async function copyRequest() {
-    const validationErrors = validateForm();
+    const validationErrors = validateForm(false);
     setErrors(validationErrors);
 
     if (validationErrors.length > 0) {
@@ -167,7 +258,13 @@ export function ContactForm() {
         </div>
         <div>
           <p className="font-semibold text-white">Solicitud de evaluación inicial</p>
-          <p className="text-sm text-slate-400">Prepara un correo seguro. No sube archivos ni guarda datos.</p>
+          <p className="text-sm text-slate-400">
+            {hasConfiguredWebhook
+              ? `Registra la solicitud en ${contactIntegrationName}. No sube archivos.`
+              : hasConfiguredRecipient
+                ? "Prepara un correo seguro. No sube archivos ni guarda datos."
+                : "Permite copiar una solicitud segura. Configurá email o webhook para enviar desde la web."}
+          </p>
         </div>
       </div>
 
@@ -236,8 +333,18 @@ export function ContactForm() {
       ) : null}
 
       <div className="mt-6 grid gap-3 sm:grid-cols-[1fr_auto]">
-        <button type="submit" className="focus-ring rounded bg-cyan px-5 py-3 text-sm font-bold text-ink transition hover:bg-white">
-          Preparar correo de evaluación
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="focus-ring rounded bg-cyan px-5 py-3 text-sm font-bold text-ink transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {hasConfiguredWebhook
+            ? isSubmitting
+              ? "Enviando solicitud"
+              : "Enviar solicitud"
+            : hasConfiguredRecipient
+              ? "Preparar correo de evaluación"
+              : "Configurar canal o copiar"}
         </button>
         <button
           type="button"
@@ -250,7 +357,11 @@ export function ContactForm() {
       </div>
 
       <p className="mt-3 text-center text-xs text-slate-500">
-        El envío final ocurre desde tu cliente de correo. No adjuntes archivos ni datos sensibles en esta solicitud.
+        {hasConfiguredWebhook
+          ? "La solicitud inicial no debe incluir archivos ni datos sensibles."
+          : hasConfiguredRecipient
+            ? "El envío final ocurre desde tu cliente de correo. No adjuntes archivos ni datos sensibles en esta solicitud."
+            : "Sin canal configurado, la solicitud no se envia desde la web."}
       </p>
     </form>
   );

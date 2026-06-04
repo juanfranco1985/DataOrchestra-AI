@@ -12,3 +12,8 @@ pilot:
   scope: "Diagnostico inicial controlado"
   report_status: pending_human_review
   delivery_allowed: false
+analytics:
+  threshold_profile: auto
+  thresholds: {}
+data_quality:
+  target_score: 70

@@ -5,10 +5,11 @@
 - v0.1 landing institucional: implementada.
 - v0.1.1 deploy publico preparado: export estatico de Next.js y workflow de GitHub Pages implementados.
 - v0.3.1 FAQ comercial: implementada como pagina `/faq`.
-- v0.4 formulario funcional inicial: implementado con email estructurado y copia para CRM.
+- v0.4 formulario funcional inicial: implementado con email estructurado, copia para CRM y webhook configurable.
 - v0.6 terminos y privacidad: base publica implementada como pagina `/terminos-privacidad`.
 - Pendiente operativo: activar Pages en GitHub con fuente `GitHub Actions`.
 - Pendiente operativo: configurar `DATAORCHESTRA_CONTACT_EMAIL`.
+- Pendiente operativo opcional: configurar `DATAORCHESTRA_CONTACT_WEBHOOK_URL` si se usara CRM o automatizacion externa.
 
 ## v0.1 - Landing institucional
 
@@ -30,9 +31,9 @@ Estado: implementado como pagina inicial `/demo`.
 
 ## v0.4 - Formulario funcional
 
-Integracion inicial con email mediante `mailto:`, validaciones de campos, confirmacion de alcance y copia de solicitud para CRM.
+Integracion inicial con email mediante `mailto:`, validaciones de campos, confirmacion de alcance, copia de solicitud para CRM y envio configurable a webhook compatible.
 
-Estado: implementado sin backend.
+Estado: implementado sin backend propio.
 
 ## v0.4.1 - FAQ comercial y objeciones
 
@@ -54,7 +55,7 @@ Estado: pagina `/privacidad` y base publica `/terminos-privacidad` implementadas
 
 Registro y seguimiento de leads con flujo comercial controlado.
 
-Estado pendiente: requiere backend, webhook o herramienta CRM definida.
+Estado: preparado a nivel web con webhook configurable. Pendiente operativo: elegir proveedor real, configurar endpoint y probar el flujo desde la URL publica.
 
 ## v0.8 - Panel privado para pilotos
 

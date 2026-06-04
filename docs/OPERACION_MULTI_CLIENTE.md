@@ -1,10 +1,10 @@
-# Operacion multi-cliente
+﻿# Operacion multi-cliente
 
 Esta unidad permite operar varios clientes piloto sin reutilizar carpetas ni mezclar datos.
 
 ## Crear un cliente nuevo
 
-Desde la raiz de `v2_0_primer_piloto_real_controlado/`:
+Desde la raiz de `DataOrchestra_AI_v2_1_integrado/`:
 
 ```powershell
 $env:PYTHONPATH="src"
@@ -54,3 +54,4 @@ clients/<cliente>/runs/<run_id>/
 ```
 
 Esto permite reconstruir que se proceso, que se reviso y que se aprobo sin depender solo de los archivos actuales.
+

@@ -65,6 +65,12 @@ DataOrchestra_AI_Diagnostico_<cliente>_<fecha>.pdf
 - No entregar logs internos salvo acuerdo especifico.
 - No entregar diagnosticos con dudas de privacidad o calidad de datos.
 
+Despues de entregar el informe aprobado, registrar el canal y destinatario:
+
+```powershell
+python -m dataorchestra.cli mark-delivered --client-dir clients/cliente_001 --recipient "Nombre responsable cliente" --method email --notes "PDF aprobado enviado" --confirm-delivery
+```
+
 ## Nota
 
 La exportacion automatica evita librerias externas de PDF y usa el motor de impresion del navegador instalado. Si el entorno no tiene navegador compatible, usar la exportacion manual desde navegador.
